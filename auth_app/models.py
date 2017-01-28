@@ -1,11 +1,12 @@
 from hashlib import sha1
 import os
 
+from pyramid.security import unauthenticated_userid
+
 from sqlalchemy import Column, Unicode, Integer
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
-
 
 Session = scoped_session(sessionmaker())
 Base = declarative_base()
@@ -17,6 +18,30 @@ def bind_engine(engine, create_all=False):
     Base.metadata.bind = engine
     if create_all is True:
         Base.metadata.create_all(engine)
+
+
+def auth_callback(userid, request):
+    """ AuthTxtAuthenticationPolicy(..., callback=auth_callback) """
+    userid = unauthenticated_userid(request)
+    if userid is None:
+        return None
+
+    user = Session.query(User).filter_by(user_id=userid).first()
+    if user is not None:
+        # return user principals a list of strings
+        return []
+    else:
+        return None
+
+
+def request_user(request):
+    """ config.add_request_method(request_user, "user", reify=True) """
+    user_id = unauthenticated_userid(request)
+    if user_id is not None:
+        user = Session.query(User).filter_by(user_id=user_id).first()
+        return user
+    else:
+        return None
 
 
 class User(Base):
