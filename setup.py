@@ -1,6 +1,8 @@
 from setuptools import setup
 
 requires = [
+    'mako',
+    'pyramid_mako',
     'pyramid',
     'sqlalchemy'
 ]

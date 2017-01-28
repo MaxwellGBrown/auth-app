@@ -10,6 +10,8 @@ import auth_app.models as app_model
 def main(global_config, **settings):
     config = Configurator(settings=settings)
 
+    config.include('pyramid_mako')
+
     # database
     engine = engine_from_config(configuration=settings, prefix="sqlalchemy.")
     app_model.bind_engine(engine, create_all=True)
