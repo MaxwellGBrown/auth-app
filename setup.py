@@ -1,7 +1,8 @@
 from setuptools import setup
 
 requires = [
-    'pyramid'
+    'pyramid',
+    'sqlalchemy'
 ]
 
 setup(
