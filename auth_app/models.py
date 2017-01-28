@@ -4,7 +4,7 @@ import os
 from sqlalchemy import Column, Unicode, Integer
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalhemy.orm import scoped_session, sessionmaker
+from sqlalchemy.orm import scoped_session, sessionmaker
 
 
 Session = scoped_session(sessionmaker())
@@ -14,7 +14,7 @@ Base = declarative_base()
 def bind_engine(engine, create_all=False):
     """ binds engine to Session & Base.metadata """
     Session.configure(bind=engine)
-    Base.meetadata.bind = engine
+    Base.metadata.bind = engine
     if create_all is True:
         Base.metadata.create_all(engine)
 
