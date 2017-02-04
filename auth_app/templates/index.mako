@@ -1,11 +1,5 @@
-<html>
-  <head>
-    <title>Auth App</title>
-  </head>
+<%inherit file="base.mako" />
 
-  <body>
-    <h1>Auth App</h1>
+<h1>Auth App</h1>
 
-	<p>Logged in as ${request.user}</p>
-  </body>
-</html>
+<p>Logged in as ${request.user}</p>
