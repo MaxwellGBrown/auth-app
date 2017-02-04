@@ -33,6 +33,7 @@ def main(global_config, **settings):
 
     # routes
     config.add_route('index', '/')
+    config.add_route('login', '/login')
 
     config.scan()
 
