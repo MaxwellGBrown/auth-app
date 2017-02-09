@@ -21,7 +21,12 @@
 
 <%def name="auth()">
   % if request.user is not None:
-    Logged in as ${request.user.email}
+    <p>
+      Logged in as ${request.user.email}
+	  <a href="${request.route_url('logout')}">
+	    Logout
+	  </a>
+	</p>
   % else:
   	<a href="${request.route_url('login')}">
 	  Log in
