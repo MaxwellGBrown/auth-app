@@ -5,7 +5,8 @@ requires = [
     'pyramid_mako',
     'pyramid',
     'pytest',
-    'sqlalchemy'
+    'sqlalchemy',
+    'webtest'
 ]
 
 setup(
