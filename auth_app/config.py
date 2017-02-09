@@ -1,11 +1,10 @@
 from pyramid.config import Configurator
-from pyramid.authentication import AuthTktAuthenticationPolicy
-from pyramid.authorization import ACLAuthorizationPolicy
 import pyramid.security as security
 from sqlalchemy import engine_from_config
 
 from auth_app.models import request_user, auth_callback
 import auth_app.models as app_model
+import auth_app.auth
 
 
 class RootFactory(object):
@@ -28,13 +27,13 @@ def main(global_config, **settings):
 
     # authentication
     auth_cfg = {k[5:]: v for k, v in settings.items() if k[:5] == "auth."}
-    authn_policy = AuthTktAuthenticationPolicy(
+    authn_policy = auth_app.auth.authentication_policy(
         callback=auth_callback, **auth_cfg
     )
     config.set_authentication_policy(authn_policy)
 
     # authorization
-    authz_policy = ACLAuthorizationPolicy()
+    authz_policy = auth_app.auth.authorization_policy()
     config.set_authorization_policy(authz_policy)
     config.set_root_factory(RootFactory)
 
