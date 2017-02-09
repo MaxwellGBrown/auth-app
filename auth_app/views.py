@@ -10,6 +10,12 @@ def index(request):
     return {}
 
 
+@view_config(route_name="home", renderer="home.mako",
+             permission="authenticated")
+def home(request):
+    return {}
+
+
 @view_defaults(route_name="login", renderer="login.mako")
 class LoginViews(object):
 
@@ -32,7 +38,7 @@ class LoginViews(object):
         user = User.one(email=self.request.POST.get('email'))
         if user.validate(self.request.POST.get('password')) is True:
             raise http.HTTPFound(
-                self.request.route_url('index'),
+                self.request.route_url('home'),
                 headers=remember(self.request, user.user_id)
             )
         else:
