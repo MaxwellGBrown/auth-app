@@ -4,6 +4,7 @@ requires = [
     'mako',
     'pyramid_mako',
     'pyramid',
+    'pytest',
     'sqlalchemy'
 ]
 
