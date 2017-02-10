@@ -3,7 +3,7 @@ import configparser
 import alembic
 from alembic.config import Config
 import pytest
-from sqlalchemy import engine_from_config
+from sqlalchemy import engine_from_config, event
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import make_transient
 
@@ -71,3 +71,31 @@ def test_user(request, ini_config, alembic_head):
         session.commit()
 
     return user
+
+
+@pytest.fixture(scope="function")
+def rollback(request, ini_config):
+    engine = engine_from_config(
+        configuration=ini_config['app:main'],
+        prefix="sqlalchemy."
+    )
+
+    connection = engine.connect()
+    app_model.Base.metadata.bind = connection
+    transaction = connection.begin()
+
+    # start a SAVEPOINT
+    app_model.Session.begin_nested()
+
+    @event.listens_for(app_model.Session, "after_transaction_end")
+    def restart_savepoint(session, transaction):
+        if transaction.nested and not transaction._parent.nested:
+            session.expire_all()
+            session.begin_nested()
+
+    def revert_changes():
+        app_model.Session.remove()
+        transaction.rollback()
+        connection.close()
+
+    request.addfinalizer(revert_changes)
