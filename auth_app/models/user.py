@@ -2,40 +2,10 @@ from hashlib import sha1
 import os
 
 from pyramid.security import unauthenticated_userid
-
 from sqlalchemy import Column, Unicode, Integer
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import scoped_session, sessionmaker
 
-Session = scoped_session(sessionmaker())
-
-
-class AppBase(object):
-    """ A declarative base mixin that lets you run queries as cls methods """
-
-    @classmethod
-    def query(cls, **kwargs):
-        return Session.query(cls).filter_by(**kwargs)
-
-    @classmethod
-    def one(cls, **kwargs):
-        return cls.query(**kwargs).one()
-
-    @classmethod
-    def all(cls, **kwargs):
-        return cls.query(**kwargs).all()
-
-
-Base = declarative_base(cls=AppBase)
-
-
-def bind_engine(engine, create_all=False):
-    """ binds engine to Session & Base.metadata """
-    Session.configure(bind=engine)
-    Base.metadata.bind = engine
-    if create_all is True:
-        Base.metadata.create_all(engine)
+from auth_app.models.meta import Base, Session
 
 
 def auth_callback(userid, request):

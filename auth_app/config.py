@@ -2,7 +2,7 @@ from pyramid.config import Configurator
 import pyramid.security as security
 from sqlalchemy import engine_from_config
 
-from auth_app.models import request_user, auth_callback
+from auth_app.models.user import request_user, auth_callback
 import auth_app.models as app_model
 import auth_app.auth
 
