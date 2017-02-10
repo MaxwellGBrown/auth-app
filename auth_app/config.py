@@ -23,7 +23,7 @@ def main(global_config, **settings):
 
     # database
     engine = engine_from_config(configuration=settings, prefix="sqlalchemy.")
-    app_model.bind_engine(engine, create_all=True)
+    app_model.bind_engine(engine)
 
     # authentication
     auth_cfg = {k[5:]: v for k, v in settings.items() if k[:5] == "auth."}
