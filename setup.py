@@ -1,6 +1,7 @@
 from setuptools import setup
 
 requires = [
+    'alembic',
     'mako',
     'pyramid_mako',
     'pyramid',
