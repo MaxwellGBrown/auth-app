@@ -5,6 +5,7 @@ import pytest
 
 @pytest.mark.unit
 def test_get_login(test_config):
+    """ LoginViews.get_login returns {} """
     from auth_app.views import LoginViews
 
     request = pyramid.testing.DummyRequest()
@@ -14,6 +15,7 @@ def test_get_login(test_config):
 
 @pytest.mark.unit
 def test_logout(test_config, ini_config):
+    """ LoginViews.logout clears the authz cookie & redirects to index """
     from auth_app.views import LoginViews
 
     cookie_name = ini_config['app:main']['auth.cookie_name']
@@ -30,6 +32,7 @@ def test_logout(test_config, ini_config):
 
 @pytest.mark.unit
 def test_post_login(test_config, test_user, ini_config, rollback):
+    """ LoginViews.post_login success redirects to index w/ cookies """
     from auth_app.views import LoginViews
 
     request = pyramid.testing.DummyRequest(
@@ -48,6 +51,7 @@ def test_post_login(test_config, test_user, ini_config, rollback):
 
 @pytest.mark.unit
 def test_post_login_bad_password(test_config, test_user, ini_config, rollback):
+    """ LoginView.post_login fails authorization w/ bad password """
     from auth_app.views import LoginViews
 
     request = pyramid.testing.DummyRequest(
@@ -63,6 +67,7 @@ def test_post_login_bad_password(test_config, test_user, ini_config, rollback):
 
 @pytest.mark.unit
 def test_post_login_no_password(test_config, test_user, ini_config, rollback):
+    """ LoginView.post_login fails authorization w/ no password """
     from auth_app.views import LoginViews
 
     request = pyramid.testing.DummyRequest(
@@ -77,6 +82,7 @@ def test_post_login_no_password(test_config, test_user, ini_config, rollback):
 
 @pytest.mark.unit
 def test_post_login_no_email(test_config, test_user, ini_config, rollback):
+    """ LoginView.post_login fails authorization w/ no email """
     from auth_app.views import LoginViews
 
     request = pyramid.testing.DummyRequest(
@@ -91,6 +97,7 @@ def test_post_login_no_email(test_config, test_user, ini_config, rollback):
 
 @pytest.mark.unit
 def test_post_login_bad_email(test_config, test_user, ini_config, rollback):
+    """ LoginView.post_login fails authorizationw w/ bad email """
     from auth_app.views import LoginViews
 
     request = pyramid.testing.DummyRequest(
@@ -106,6 +113,7 @@ def test_post_login_bad_email(test_config, test_user, ini_config, rollback):
 
 @pytest.mark.unit
 def test_post_login_no_credentials(test_config, ini_config, rollback):
+    """ LoginView.post_login fails authorization w/ no credentials """
     from auth_app.views import LoginViews
 
     request = pyramid.testing.DummyRequest()
