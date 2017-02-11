@@ -16,14 +16,15 @@ class RootFactory(object):
         self.request = request
 
 
-def main(global_config, **settings):
-    config = Configurator(settings=settings)
+def configure(config, **settings):
+    """ does initialization for main() so tests can also use config """
 
     config.include('pyramid_mako')
 
-    # database
-    engine = engine_from_config(configuration=settings, prefix="sqlalchemy.")
-    app_model.bind_engine(engine)
+    # authorization
+    authz_policy = auth_app.auth.authorization_policy()
+    config.set_authorization_policy(authz_policy)
+    config.set_root_factory(RootFactory)
 
     # authentication
     auth_cfg = {k[5:]: v for k, v in settings.items() if k[:5] == "auth."}
@@ -31,11 +32,6 @@ def main(global_config, **settings):
         callback=auth_callback, **auth_cfg
     )
     config.set_authentication_policy(authn_policy)
-
-    # authorization
-    authz_policy = auth_app.auth.authorization_policy()
-    config.set_authorization_policy(authz_policy)
-    config.set_root_factory(RootFactory)
 
     # request methods
     config.add_request_method(request_user, "user", reify=True)
@@ -45,6 +41,16 @@ def main(global_config, **settings):
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
     config.add_route('home', '/home')
+
+
+def main(global_config, **settings):
+    config = Configurator(settings=settings)
+
+    # connect ORM model to database
+    engine = engine_from_config(configuration=settings, prefix="sqlalchemy.")
+    app_model.bind_engine(engine)
+
+    configure(config, **settings)
 
     config.scan()
 
