@@ -56,6 +56,7 @@ def test_user(request, ini_config, alembic_head):
         email="test@example.com",
         password="password123"
     )
+    user._unhashed_password = "password123"
 
     session.add(user)
     session.commit()

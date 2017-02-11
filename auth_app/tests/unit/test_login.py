@@ -35,7 +35,7 @@ def test_post_login(test_config, test_user, ini_config, rollback):
     request = pyramid.testing.DummyRequest(
         post={
             "email": test_user.email,
-            "password": "password123"
+            "password": test_user._unhashed_password
         }
     )
 
@@ -96,7 +96,7 @@ def test_post_login_bad_email(test_config, test_user, ini_config, rollback):
     request = pyramid.testing.DummyRequest(
         post={
             "email": "bad@fail.com",
-            "password": "password123"
+            "password": test_user._unhashed_password
         }
     )
 
