@@ -35,11 +35,16 @@ class LoginViews(object):
 
     @view_config(request_method="POST")
     def post_login(self):
-        user = User.one(email=self.request.POST.get('email'))
-        if user.validate(self.request.POST.get('password')) is True:
-            raise http.HTTPFound(
+        try:
+            user = User.one(email=self.request.POST.get('email'))
+        except:
+            return {}
+
+        if user.validate(self.request.POST.get('password', '')) is True:
+            headers = remember(self.request, user.user_id)
+            return http.HTTPFound(
                 self.request.route_url('home'),
-                headers=remember(self.request, user.user_id)
+                headers=headers
             )
         else:
             return {}
