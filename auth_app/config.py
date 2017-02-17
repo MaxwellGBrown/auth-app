@@ -9,7 +9,8 @@ import auth_app.auth
 
 class RootFactory(object):
     __acl__ = [
-        (security.Allow, security.Authenticated, 'authenticated')
+        (security.Allow, security.Authenticated, 'authenticated'),
+        (security.Allow, 'admin', 'admin')
     ]
 
     def __init__(self, request):
