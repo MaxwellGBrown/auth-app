@@ -46,6 +46,14 @@ Getting Started
       $ pserve development.ini
 
 
+The application comes pre-setup with the user ``admin@localhost`` w/ the password ``hunter2``.
+
+
+.. warning::
+
+    Remember to either remove the initial user ``admin@localhost`` or change it's password if ever doing any production work w/ this!
+
+
 Extending the Application
 -------------------------
 
