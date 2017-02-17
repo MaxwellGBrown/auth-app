@@ -5,19 +5,8 @@ from pyramid.security import remember, forget
 from auth_app.models import User
 
 
-@view_config(route_name='index', renderer='index.mako')
-def index(request):
-    return {}
-
-
-@view_config(route_name="home", renderer="home.mako",
-             permission="authenticated")
-def home(request):
-    return {}
-
-
 @view_defaults(route_name="login", renderer="login.mako")
-class LoginViews(object):
+class AuthViews(object):
 
     def __init__(self, request):
         self.request = request

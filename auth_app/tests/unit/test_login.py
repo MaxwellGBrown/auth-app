@@ -5,18 +5,18 @@ import pytest
 
 @pytest.mark.unit
 def test_get_login(test_config):
-    """ LoginViews.get_login returns {} """
-    from auth_app.views import LoginViews
+    """ AuthViews.get_login returns {} """
+    from auth_app.views.auth import AuthViews
 
     request = pyramid.testing.DummyRequest()
 
-    assert LoginViews(request).get_login() == {}
+    assert AuthViews(request).get_login() == {}
 
 
 @pytest.mark.unit
 def test_logout(test_config, ini_config):
-    """ LoginViews.logout clears the authz cookie & redirects to index """
-    from auth_app.views import LoginViews
+    """ AuthViews.logout clears the authz cookie & redirects to index """
+    from auth_app.views.auth import AuthViews
 
     cookie_name = ini_config['app:main']['auth.cookie_name']
 
@@ -24,7 +24,7 @@ def test_logout(test_config, ini_config):
         cookies=[(cookie_name, 'DELETE_ME')]
     )
 
-    response = LoginViews(request).logout()
+    response = AuthViews(request).logout()
     assert isinstance(response, http.HTTPFound)
     assert response.headers['Location'].endswith('/')
     assert response.headers['Set-Cookie'].startswith(cookie_name + "=;")
@@ -32,8 +32,8 @@ def test_logout(test_config, ini_config):
 
 @pytest.mark.unit
 def test_post_login(test_config, test_user, ini_config, rollback):
-    """ LoginViews.post_login success redirects to index w/ cookies """
-    from auth_app.views import LoginViews
+    """ AuthViews.post_login success redirects to index w/ cookies """
+    from auth_app.views.auth import AuthViews
 
     request = pyramid.testing.DummyRequest(
         post={
@@ -42,7 +42,7 @@ def test_post_login(test_config, test_user, ini_config, rollback):
         }
     )
 
-    response = LoginViews(request).post_login()
+    response = AuthViews(request).post_login()
     assert isinstance(response, http.HTTPFound)
     assert response.headers['Location'].endswith('/home')
     cookie_name = ini_config['app:main']['auth.cookie_name']
@@ -52,7 +52,7 @@ def test_post_login(test_config, test_user, ini_config, rollback):
 @pytest.mark.unit
 def test_post_login_bad_password(test_config, test_user, ini_config, rollback):
     """ LoginView.post_login fails authorization w/ bad password """
-    from auth_app.views import LoginViews
+    from auth_app.views.auth import AuthViews
 
     request = pyramid.testing.DummyRequest(
         post={
@@ -61,14 +61,14 @@ def test_post_login_bad_password(test_config, test_user, ini_config, rollback):
         }
     )
 
-    response = LoginViews(request).post_login()
+    response = AuthViews(request).post_login()
     assert response == {}
 
 
 @pytest.mark.unit
 def test_post_login_no_password(test_config, test_user, ini_config, rollback):
     """ LoginView.post_login fails authorization w/ no password """
-    from auth_app.views import LoginViews
+    from auth_app.views.auth import AuthViews
 
     request = pyramid.testing.DummyRequest(
         post={
@@ -76,14 +76,14 @@ def test_post_login_no_password(test_config, test_user, ini_config, rollback):
         }
     )
 
-    response = LoginViews(request).post_login()
+    response = AuthViews(request).post_login()
     assert response == {}
 
 
 @pytest.mark.unit
 def test_post_login_no_email(test_config, test_user, ini_config, rollback):
     """ LoginView.post_login fails authorization w/ no email """
-    from auth_app.views import LoginViews
+    from auth_app.views.auth import AuthViews
 
     request = pyramid.testing.DummyRequest(
         post={
@@ -91,14 +91,14 @@ def test_post_login_no_email(test_config, test_user, ini_config, rollback):
         }
     )
 
-    response = LoginViews(request).post_login()
+    response = AuthViews(request).post_login()
     assert response == {}
 
 
 @pytest.mark.unit
 def test_post_login_bad_email(test_config, test_user, ini_config, rollback):
     """ LoginView.post_login fails authorizationw w/ bad email """
-    from auth_app.views import LoginViews
+    from auth_app.views.auth import AuthViews
 
     request = pyramid.testing.DummyRequest(
         post={
@@ -107,16 +107,16 @@ def test_post_login_bad_email(test_config, test_user, ini_config, rollback):
         }
     )
 
-    response = LoginViews(request).post_login()
+    response = AuthViews(request).post_login()
     assert response == {}
 
 
 @pytest.mark.unit
 def test_post_login_no_credentials(test_config, ini_config, rollback):
     """ LoginView.post_login fails authorization w/ no credentials """
-    from auth_app.views import LoginViews
+    from auth_app.views.auth import AuthViews
 
     request = pyramid.testing.DummyRequest()
 
-    response = LoginViews(request).post_login()
+    response = AuthViews(request).post_login()
     assert response == {}
