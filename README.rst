@@ -49,9 +49,10 @@ Getting Started
 The application comes pre-setup with the user ``admin@localhost`` w/ the password ``hunter2``.
 
 
-.. warning::
+Caution for Deployment
+~~~~~~~~~~~~~~~~~~~~~~
 
-    Remember to either remove the initial user ``admin@localhost`` or change it's password if ever doing any production work w/ this!
+Remember to either remove the initial user ``admin@localhost`` or change it's password if ever doing any production work w/ this!
 
 
 Extending the Application
