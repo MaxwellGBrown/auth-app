@@ -75,4 +75,4 @@ class AdminUser(User):
 
     __mapper_args__ = {"polymorphic_identity": "admin"}
 
-    permissions = ("admin")
+    permissions = ("admin",)

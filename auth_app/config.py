@@ -42,6 +42,7 @@ def configure(config, **settings):
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
     config.add_route('home', '/home')
+    config.add_route('manage_users', '/admin/users')
 
 
 def main(global_config, **settings):

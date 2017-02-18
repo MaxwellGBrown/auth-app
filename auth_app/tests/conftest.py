@@ -74,6 +74,41 @@ def test_user(request, ini_config, alembic_head):
     return user
 
 
+@pytest.fixture(scope="session")
+def test_admin(request, ini_config, alembic_head):
+    """
+    Returns a transient AdminUser object that represents an object in the db
+    """
+    engine = engine_from_config(
+        configuration=ini_config['app:main'],
+        prefix="sqlalchemy."
+    )
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    admin_user = app_model.AdminUser(
+        email="admin@example.com",
+        password="foobar12",
+        user_type="admin"
+    )
+    admin_user._unhashed_password = "foobar12"
+
+    session.add(admin_user)
+    session.commit()
+
+    session.refresh(admin_user)
+    make_transient(admin_user)
+
+    session.close()
+
+    def remove_test_admin_user():
+        session = Session()
+        session.delete(admin_user)
+        session.commit()
+
+    return admin_user
+
+
 @pytest.fixture(scope="function")
 def rollback(request, ini_config):
     engine = engine_from_config(

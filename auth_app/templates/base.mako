@@ -7,7 +7,7 @@
 
   <body>
   	${self.header()}
-    ${next.body()}
+    ${next.body(**context.kwargs)}
   </body>
 </html>
 
