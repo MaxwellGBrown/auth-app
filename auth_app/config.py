@@ -43,6 +43,7 @@ def configure(config, **settings):
     config.add_route('logout', '/logout')
     config.add_route('home', '/home')
     config.add_route('manage_users', '/admin/users')
+    config.add_route('create_user', '/admin/users/create')
 
 
 def main(global_config, **settings):
