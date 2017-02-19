@@ -113,12 +113,13 @@ def test_admin(request, ini_config, alembic_head):
 def rollback(request, ini_config):
     engine = engine_from_config(
         configuration=ini_config['app:main'],
-        prefix="sqlalchemy."
+        prefix="sqlalchemy.",
+        echo=True
     )
 
     connection = engine.connect()
-    app_model.Base.metadata.bind = connection
     transaction = connection.begin()
+    app_model.bind_engine(connection)
 
     # start a SAVEPOINT
     app_model.Session.begin_nested()
@@ -135,3 +136,18 @@ def rollback(request, ini_config):
         connection.close()
 
     request.addfinalizer(revert_changes)
+
+
+@pytest.fixture
+def new_user_kwargs():
+    """
+    **kwargs that model the values for a new User object.
+
+    This is done so that a change to the user model doesn't require a change in
+    every single test; just to this fixture!
+    """
+    return dict(
+        email='newuser@example.com',
+        password='new_user_kwargs123',
+        user_type='basic'
+    )
