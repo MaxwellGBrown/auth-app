@@ -2,7 +2,10 @@ import pyramid.httpexceptions as http
 import pyramid.testing
 import pytest
 
-from auth_app.models import User, Session
+from auth_app.models import User
+
+
+pytestmark = pytest.mark.usefixtures("rollback")
 
 
 @pytest.mark.unit
@@ -20,8 +23,7 @@ def test_get_manage_user(test_config, alembic_head):
 
 
 @pytest.mark.unit
-def test_create_user_redirects(test_config, alembic_head, rollback,
-                               new_user_kwargs):
+def test_create_user_redirects(test_config, alembic_head, new_user_kwargs):
     """ UserManagementViews.create_user redirects """
     from auth_app.views.admin import UserManagementViews
 
@@ -32,16 +34,13 @@ def test_create_user_redirects(test_config, alembic_head, rollback,
 
 
 @pytest.mark.unit
-def test_create_user_makes_user(test_config, alembic_head, rollback,
-                                new_user_kwargs):
+def test_create_user_makes_user(test_config, alembic_head, new_user_kwargs):
     """ UserManagementViews.create_user inserts new user into DB """
     from auth_app.views.admin import UserManagementViews
 
-    # TODO: Rollback isn't working :(
-    new_user_kwargs['email'] = 'rollback@isbroken'
-    # # just make sure the new_user isn't already in the DB
-    # results = User.all(email=new_user_kwargs['email'])
-    # assert len(results) == 0
+    # just make sure the new_user isn't already in the DB
+    results = User.all(email=new_user_kwargs['email'])
+    assert len(results) == 0
 
     request = pyramid.testing.DummyRequest(params=new_user_kwargs)
     UserManagementViews(request).create_user()

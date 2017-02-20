@@ -47,8 +47,7 @@ def engine(ini_config):
     """ Several fixtures require an engine before one has been initialized """
     return engine_from_config(
         configuration=ini_config['app:main'],
-        prefix="sqlalchemy.",
-        echo=True
+        prefix="sqlalchemy."
     )
 
 
@@ -113,18 +112,31 @@ def test_admin(request, ini_config, alembic_head, engine):
 
 @pytest.fixture(scope="function")
 def rollback(request, ini_config, engine):
+    """
+    Force app_model.Session into a connection level transaction.
+
+    This transaction is rolled back after a test completes which causes any
+    changes to the database made during a test to be wiped clean before the
+    next test.
+    """
+    # force any pre-existing sessions to close so we can force them to this one
+    app_model.Session.remove()
+
     connection = engine.connect()
     transaction = connection.begin()
     app_model.bind_engine(connection)
 
-    # start a SAVEPOINT
-    app_model.Session.begin_nested()
+    # TODO: This portion isn't working as it used to. 
+    #       When the day comes where a ROLLBACK is issued during a test, this
+    #       will need to be re-implemented
+    # # start a SAVEPOINT
+    # app_model.Session.begin_nested()
 
-    @event.listens_for(app_model.Session, "after_transaction_end")
-    def restart_savepoint(session, transaction):
-        if transaction.nested and not transaction._parent.nested:
-            session.expire_all()
-            session.begin_nested()
+    # @event.listens_for(app_model.Session, "after_transaction_end")
+    # def restart_savepoint(session, transaction):
+    #     if transaction.nested and not transaction._parent.nested:
+    #         session.expire_all()
+    #         session.begin_nested()
 
     def revert_changes():
         app_model.Session.remove()
@@ -132,6 +144,7 @@ def rollback(request, ini_config, engine):
         connection.close()
 
     request.addfinalizer(revert_changes)
+    return connection
 
 
 @pytest.fixture
