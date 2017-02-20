@@ -43,12 +43,18 @@ def alembic_head(request, ini_filepath):
 
 
 @pytest.fixture(scope="session")
-def test_user(request, ini_config, alembic_head):
-    """ Returns a transient User object that represents an object in the db """
-    engine = engine_from_config(
+def engine(ini_config):
+    """ Several fixtures require an engine before one has been initialized """
+    return engine_from_config(
         configuration=ini_config['app:main'],
-        prefix="sqlalchemy."
+        prefix="sqlalchemy.",
+        echo=True
     )
+
+
+@pytest.fixture(scope="session")
+def test_user(request, ini_config, alembic_head, engine):
+    """ Returns a transient User object that represents an object in the db """
     Session = sessionmaker(bind=engine)
     session = Session()
 
@@ -75,14 +81,10 @@ def test_user(request, ini_config, alembic_head):
 
 
 @pytest.fixture(scope="session")
-def test_admin(request, ini_config, alembic_head):
+def test_admin(request, ini_config, alembic_head, engine):
     """
     Returns a transient AdminUser object that represents an object in the db
     """
-    engine = engine_from_config(
-        configuration=ini_config['app:main'],
-        prefix="sqlalchemy."
-    )
     Session = sessionmaker(bind=engine)
     session = Session()
 
@@ -110,13 +112,7 @@ def test_admin(request, ini_config, alembic_head):
 
 
 @pytest.fixture(scope="function")
-def rollback(request, ini_config):
-    engine = engine_from_config(
-        configuration=ini_config['app:main'],
-        prefix="sqlalchemy.",
-        echo=True
-    )
-
+def rollback(request, ini_config, engine):
     connection = engine.connect()
     transaction = connection.begin()
     app_model.bind_engine(connection)
