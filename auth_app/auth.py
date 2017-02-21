@@ -1,8 +1,18 @@
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
-from pyramid.security import unauthenticated_userid
+import pyramid.security as security
 
 from auth_app.models import Session, User
+
+
+class RootFactory(object):
+    __acl__ = [
+        (security.Allow, security.Authenticated, 'authenticated'),
+        (security.Allow, 'admin', 'admin')
+    ]
+
+    def __init__(self, request):
+        self.request = request
 
 
 def authentication_policy(*args, **kwargs):
@@ -15,7 +25,7 @@ def authorization_policy(*args, **kwargs):
 
 def auth_callback(userid, request):
     """ AuthTxtAuthenticationPolicy(..., callback=auth_callback) """
-    userid = unauthenticated_userid(request)
+    userid = security.unauthenticated_userid(request)
     if userid is None:
         return None
 

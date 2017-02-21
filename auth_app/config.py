@@ -1,20 +1,9 @@
 from pyramid.config import Configurator
-import pyramid.security as security
 from sqlalchemy import engine_from_config
 
 import auth_app.auth
 import auth_app.models as app_model
 from auth_app.request import request_user
-
-
-class RootFactory(object):
-    __acl__ = [
-        (security.Allow, security.Authenticated, 'authenticated'),
-        (security.Allow, 'admin', 'admin')
-    ]
-
-    def __init__(self, request):
-        self.request = request
 
 
 def configure(config, **settings):
@@ -25,7 +14,7 @@ def configure(config, **settings):
     # authorization
     authz_policy = auth_app.auth.authorization_policy()
     config.set_authorization_policy(authz_policy)
-    config.set_root_factory(RootFactory)
+    config.set_root_factory(auth_app.auth.RootFactory)
 
     # authentication
     auth_cfg = {k[5:]: v for k, v in settings.items() if k[:5] == "auth."}
