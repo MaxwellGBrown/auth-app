@@ -1,34 +1,10 @@
 from hashlib import sha1
 import os
 
-from pyramid.security import unauthenticated_userid
 from sqlalchemy import Column, Unicode, Integer
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from auth_app.models.meta import Base, Session
-
-
-def auth_callback(userid, request):
-    """ AuthTxtAuthenticationPolicy(..., callback=auth_callback) """
-    userid = unauthenticated_userid(request)
-    if userid is None:
-        return None
-
-    user = Session.query(User).filter_by(user_id=userid).first()
-    if user is not None:
-        return user.permissions
-    else:
-        return None
-
-
-def request_user(request):
-    """ config.add_request_method(request_user, "user", reify=True) """
-    user_id = unauthenticated_userid(request)
-    if user_id is not None:
-        user = Session.query(User).filter_by(user_id=user_id).first()
-        return user
-    else:
-        return None
+from auth_app.models.meta import Base
 
 
 class User(Base):

@@ -3,7 +3,7 @@ import pytest
 
 import auth_app.auth
 from auth_app.config import main
-from auth_app.models.user import auth_callback
+from auth_app.auth import auth_callback
 
 
 @pytest.fixture(scope="class")
