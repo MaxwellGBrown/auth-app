@@ -23,7 +23,10 @@
 <ul>
   % for user in users:
     <li>
-	  ${user.email}
+	  <b>${user.email}</b>
+	  <a href="${request.route_url('delete_user', user_id=user.user_id)}">
+	    delete
+	  </a>
 	</li>
   % endfor
 </ul>

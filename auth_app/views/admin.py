@@ -23,3 +23,9 @@ class UserManagementViews(object):
         except:
             Session.rollback()
         return http.HTTPFound(self.request.route_url("manage_users"))
+
+    @view_config(route_name="delete_user", context=User)
+    def delete_user(self):
+        Session.delete(self.request.context)
+        Session.commit()
+        return http.HTTPFound(self.request.route_url("manage_users"))

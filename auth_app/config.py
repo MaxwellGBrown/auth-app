@@ -37,13 +37,17 @@ def configure(config, **settings):
     # request methods
     config.add_request_method(request_user, "user", reify=True)
 
-    # routes
+    # standard routes
     config.add_route('index', '/')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
     config.add_route('home', '/home')
+
+    # /admin/users
     config.add_route('manage_users', '/admin/users')
     config.add_route('create_user', '/admin/users/create')
+    config.add_route('delete_user', '/admin/users/delete/{user_id}',
+                     factory=app_model.User.route_factory)
 
 
 def main(global_config, **settings):
