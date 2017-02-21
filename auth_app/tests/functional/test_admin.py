@@ -34,8 +34,14 @@ def test_post_create_user(test_app, as_test_admin, new_user_kwargs):
     """ POST /admin/users creates new user """
     test_app.post('/admin/users/create', params=new_user_kwargs, status=302)
 
+    new_user = User.one(email=new_user_kwargs['email'])
+    assert new_user
+    assert new_user.validate(new_user_kwargs['password'])
+    assert new_user.user_type == new_user_kwargs['user_type']
+
 
 @pytest.mark.functional
-def test_post_create_user2(test_app, as_test_admin, new_user_kwargs):
-    """ POST /admin/users creates new user """
-    test_app.post('/admin/users/create', params=new_user_kwargs, status=302)
+def test_post_create_user_unauthorized(test_app, as_test_user,
+                                       new_user_kwargs):
+    """ POST /admin/users 403's without authorization """
+    test_app.post('/admin/users/create', params=new_user_kwargs, status=403)
