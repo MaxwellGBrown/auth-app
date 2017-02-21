@@ -21,5 +21,5 @@ class UserManagementViews(object):
         try:
             Session.commit()
         except:
-            pass
+            raise
         return http.HTTPFound(self.request.route_url("manage_users"))

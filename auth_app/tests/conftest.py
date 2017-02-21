@@ -125,6 +125,7 @@ def rollback(request, ini_config, engine):
     connection = engine.connect()
     transaction = connection.begin()
     app_model.bind_engine(connection)
+    app_model.Session.bind  # this makes it work?
 
     # TODO: This portion isn't working as it used to. 
     #       When the day comes where a ROLLBACK is issued during a test, this
