@@ -48,3 +48,36 @@ def test_create_user_makes_user(test_config, alembic_head, new_user_kwargs):
     new_user = User.one(email=new_user_kwargs['email'])
     assert new_user.email == new_user_kwargs['email']
     assert new_user.user_type == new_user_kwargs['user_type']
+
+
+@pytest.mark.unit
+def test_create_user_email_unique(test_config, alembic_head, new_user_kwargs,
+                                  test_user):
+    """ UserManagementViews.create_user fails w/ non-unique email address """
+    from auth_app.views.admin import UserManagementViews
+
+    new_user_kwargs['email'] = test_user.email
+
+    count = len(User.all())
+
+    request = pyramid.testing.DummyRequest(params=new_user_kwargs)
+    UserManagementViews(request).create_user()
+
+    assert len(User.all()) == count
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("missing_kwargs", ["email", "password"])
+def test_create_user_required_arguments(test_config, alembic_head,
+                                        new_user_kwargs, missing_kwargs):
+    """ UserManagementViews.create_user fails when missing required values """
+    from auth_app.views.admin import UserManagementViews
+
+    count = len(User.all())
+
+    new_user_kwargs.pop(missing_kwargs)
+
+    request = pyramid.testing.DummyRequest(params=new_user_kwargs)
+    UserManagementViews(request).create_user()
+
+    assert len(User.all()) == count
