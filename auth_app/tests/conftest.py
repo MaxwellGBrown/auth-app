@@ -3,7 +3,7 @@ import configparser
 import alembic
 from alembic.config import Config
 import pytest
-from sqlalchemy import engine_from_config, event
+from sqlalchemy import engine_from_config
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import make_transient
 
@@ -125,9 +125,9 @@ def rollback(request, ini_config, engine):
     connection = engine.connect()
     transaction = connection.begin()
     app_model.bind_engine(connection)
-    app_model.Session.bind  # this makes it work?
+    app_model.Session.bind  # force scoped_sessions getattr on bind
 
-    # TODO: This portion isn't working as it used to. 
+    # TODO: This portion isn't working as it used to.
     #       When the day comes where a ROLLBACK is issued during a test, this
     #       will need to be re-implemented
     # # start a SAVEPOINT
