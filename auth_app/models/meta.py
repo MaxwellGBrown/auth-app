@@ -1,3 +1,4 @@
+import pyramid.security as security
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 
@@ -7,6 +8,11 @@ Session = scoped_session(sessionmaker())
 
 class AppBase(object):
     """ A declarative base mixin that lets you run queries as cls methods """
+
+    __acl__ = (
+        (security.Allow, security.Authenticated, 'authenticated'),
+        (security.Allow, 'admin', 'admin')
+    )
 
     @classmethod
     def query(cls, **kwargs):

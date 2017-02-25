@@ -1,4 +1,4 @@
-from .meta import Base, Session
+from .meta import Base, Session, AppBase  # noqa
 from .user import User, AdminUser  # noqa
 
 

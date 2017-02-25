@@ -14,7 +14,7 @@ def configure(config, **settings):
     # authorization
     authz_policy = auth_app.auth.authorization_policy()
     config.set_authorization_policy(authz_policy)
-    config.set_root_factory(auth_app.auth.RootFactory)
+    config.set_root_factory(auth_app.auth.root_factory)
 
     # authentication
     auth_cfg = {k[5:]: v for k, v in settings.items() if k[:5] == "auth."}

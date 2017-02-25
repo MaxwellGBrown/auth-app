@@ -2,17 +2,11 @@ from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 import pyramid.security as security
 
-from auth_app.models import Session, User
+from auth_app.models import Session, User, AppBase
 
 
-class RootFactory(object):
-    __acl__ = [
-        (security.Allow, security.Authenticated, 'authenticated'),
-        (security.Allow, 'admin', 'admin')
-    ]
-
-    def __init__(self, request):
-        self.request = request
+def root_factory(request):
+    return AppBase
 
 
 def authentication_policy(*args, **kwargs):
