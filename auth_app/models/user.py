@@ -8,7 +8,7 @@ from auth_app.models.meta import Base
 
 
 class User(Base):
-    """ Authentication model w/ Authorization permissions """
+    """ Authentication model for all Users """
     __tablename__ = "user"
 
     user_id = Column(Integer, autoincrement=True, primary_key=True)
@@ -20,11 +20,8 @@ class User(Base):
 
     __mapper_args__ = {
         "polymorphic_on": user_type,
-        "polymorphic_identity": "basic"
+        "polymorphic_identity": None
     }
-
-    # ACL Permissions associated w/ user_type="basic"
-    permissions = tuple()
 
     @hybrid_property
     def password(self):
@@ -44,6 +41,14 @@ class User(Base):
         hashed_password = sha1(combined_password.encode("UTF-8"))
         passwords_match = self.password[40:] == hashed_password.hexdigest()
         return passwords_match
+
+
+class BasicUser(User):
+    """ Authentication model w/ Authorization permissions """
+
+    __mapper_args__ = {"polymorphic_identity": "basic"}
+
+    permissions = tuple()
 
 
 class AdminUser(User):
