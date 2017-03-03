@@ -1,6 +1,6 @@
 <%inherit file="base.mako" />
 
-<form action="${request.route_url('redeem', token=request.context.token)}" method="POST">
+<form id="change-password-form" action="${request.route_url('redeem', token=request.context.token)}" method="POST">
   <label for="password">
     New Password
   </label>

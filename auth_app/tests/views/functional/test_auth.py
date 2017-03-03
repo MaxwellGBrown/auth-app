@@ -2,6 +2,8 @@ from urllib.parse import urlparse
 
 import pytest
 
+from auth_app.models import User, Session
+
 
 pytestmark = [
     pytest.mark.functional,
@@ -103,3 +105,42 @@ def test_post_login_empty(test_app, test_user):
     response = test_app.post('/login', status=200)
 
     assert response.headers.get('Set-Cookie') is None
+
+
+def test_get_redeem(test_app, test_user):
+    """
+    GET /redeem/<token> has #change-password-form with appropriate fields
+    """
+    path = '/redeem/{}'.format(test_user.token)
+    response = test_app.get(path, status=200)
+
+    form = response.html.find(id="change-password-form")
+    assert form
+    assert form["action"].endswith(path)
+    assert form["method"] == "POST"
+    assert form.select('label[for="password"]')
+    assert form.select('input[name="password"]')
+    assert form.select('input[type="submit"]')
+
+
+def test_redeem_token(test_app, test_user):
+    """
+    GET /redeem/<token> form submit changes a users password and clears token
+    """
+
+    user = User.one(user_id=test_user.user_id)
+    assert user.token is not None
+
+    path = "/redeem/{}".format(user.token)
+    get_response = test_app.get(path)
+
+    password_form = get_response.forms["change-password-form"]
+    password_form["password"] = "new_password"
+
+    post_response = password_form.submit()
+    Session.refresh(user)
+    assert post_response.status == "302 Found"
+    assert post_response.location.endswith("/login")
+    assert user.token is None
+    assert user.validate("new_password") is True
+    assert user.validate(test_user._unhashed_password) is False
