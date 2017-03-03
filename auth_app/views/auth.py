@@ -42,3 +42,26 @@ class AuthViews(object):
             )
         else:
             return {}
+
+
+@view_defaults(route_name="redeem", context=User)
+class RedeemTokenViews(object):
+
+    def __init__(self, request):
+        self.request = request
+        self.user = request.context
+
+    @view_config(request_method="GET")
+    def get_redeem_token(self):
+        """ Show the set password screen """
+        return {}
+
+    @view_config(request_method="POST")
+    def post_redeem_token(self):
+        """ Clear the token and set the posted password """
+        self.user.token = None
+        self.user.password = self.request.POST.get("password")
+        Session.add(self.user)
+        Session.commit()
+
+        return http.HTTPFound(self.request.route_url("login"))

@@ -30,6 +30,8 @@ def configure(config, **settings):
     config.add_route('index', '/')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
+    config.add_route('redeem', '/redeem/{token}',
+                     factory=app_model.User.route_factory)
     config.add_route('home', '/home')
 
     # /admin/users
