@@ -8,6 +8,7 @@ from auth_app.models import User
 
 pytestmark = [
     pytest.mark.unit,
+    pytest.mark.views,
     pytest.mark.usefixtures("rollback")
 ]
 

@@ -6,6 +6,7 @@ from auth_app.models import User
 
 pytestmark = [
     pytest.mark.functional,
+    pytest.mark.views,
     pytest.mark.usefixtures("rollback")
 ]
 

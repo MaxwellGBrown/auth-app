@@ -5,6 +5,7 @@ import pytest
 
 pytestmark = [
     pytest.mark.functional,
+    pytest.mark.views,
     pytest.mark.usefixtures("rollback")
 ]
 

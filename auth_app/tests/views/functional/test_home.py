@@ -2,7 +2,8 @@ import pytest
 
 
 pytestmark = [
-   pytest.mark.functional
+   pytest.mark.functional,
+   pytest.mark.views
 ]
 
 
