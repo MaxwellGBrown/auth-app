@@ -4,10 +4,12 @@ import sqlalchemy.orm.exc as orm_exc
 from auth_app.models import User
 
 
-pytestmark = pytest.mark.usefixtures("rollback")
+pytestmark = [
+    pytest.mark.functional,
+    pytest.mark.usefixtures("rollback")
+]
 
 
-@pytest.mark.functional
 def test_get_manage_users(test_app, as_test_admin):
     """ GET /admin/users 200 shows all users while auth as an admin """
     response = test_app.get('/admin/users', status=200)
@@ -18,19 +20,16 @@ def test_get_manage_users(test_app, as_test_admin):
         assert user.email in response
 
 
-@pytest.mark.functional
 def test_get_manage_users_unauthenticated(test_app):
     """ GET /admin/users 403 while unauthenticated """
     test_app.get('/admin/users', status=403)
 
 
-@pytest.mark.functional
 def test_get_manage_users_unauthorized(test_app, as_test_user):
     """ GET /admin/users 403 without authorization """
     test_app.get('/admin/users', status=403)
 
 
-@pytest.mark.functional
 def test_post_create_user(test_app, as_test_admin, new_user_kwargs):
     """ POST /admin/users creates new user """
     test_app.post('/admin/users/create', params=new_user_kwargs, status=302)
@@ -41,20 +40,17 @@ def test_post_create_user(test_app, as_test_admin, new_user_kwargs):
     assert new_user.user_type == new_user_kwargs['user_type']
 
 
-@pytest.mark.functional
 def test_post_create_user_unauthorized(test_app, as_test_user,
                                        new_user_kwargs):
     """ POST /admin/users 403's without authorization """
     test_app.post('/admin/users/create', params=new_user_kwargs, status=403)
 
 
-@pytest.mark.functional
 def test_post_create_user_unauthenticated(test_app, new_user_kwargs):
     """ POST /admin/users 403's without authorization """
     test_app.post('/admin/users/create', params=new_user_kwargs, status=403)
 
 
-@pytest.mark.functional
 def test_get_delete_user(test_app, as_test_admin, test_user):
     """ GET /admin/users/delete/<id> removes associated user """
     response = test_app.get(
@@ -70,7 +66,6 @@ def test_get_delete_user(test_app, as_test_admin, test_user):
     assert test_user.email not in redirect.html.find(id="user-list")
 
 
-@pytest.mark.functional
 def test_post_delete_user_unauthenticated(test_app, test_user):
     """ POST /admin/users/delete/<id> 403's without authentication """
     test_app.post(
@@ -78,7 +73,6 @@ def test_post_delete_user_unauthenticated(test_app, test_user):
     )
 
 
-@pytest.mark.functional
 def test_get_delete_user_unauthorized(test_app, as_test_user, test_admin):
     """ POST /admin/users/delete/<id> 403's without authorization """
     test_app.post(
@@ -86,7 +80,6 @@ def test_get_delete_user_unauthorized(test_app, as_test_user, test_admin):
     )
 
 
-@pytest.mark.functional
 def test_get_delete_user_nonexistant(test_app, as_test_admin):
     """ POST /admin/users/delete/<id> 404's if user doesn't exist """
 

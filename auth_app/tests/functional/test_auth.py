@@ -3,7 +3,12 @@ from urllib.parse import urlparse
 import pytest
 
 
-@pytest.mark.functional
+pytestmark = [
+    pytest.mark.functional,
+    pytest.mark.usefixtures("rollback")
+]
+
+
 def test_get_login(test_app):
     """
     GET /login 200
@@ -23,7 +28,6 @@ def test_get_login(test_app):
     assert login_form.find('input', attrs={'type': 'submit'})
 
 
-@pytest.mark.functional
 def test_get_logout(test_app, as_test_user, ini_config):
     """ GET /logout while auth clears cookies & redirects to / """
     cookie_name = ini_config['app:main']['auth.cookie_name']
@@ -42,7 +46,6 @@ def test_get_logout(test_app, as_test_user, ini_config):
     assert redirect.status == '200 OK'
 
 
-@pytest.mark.functional
 def test_post_login(test_app, as_test_user, ini_config):
     """ POST /login authenticates & redirects to /home """
     cookie_name = ini_config['app:main']['auth.cookie_name']
@@ -66,7 +69,6 @@ def test_post_login(test_app, as_test_user, ini_config):
     assert redirect.status == '200 OK'
 
 
-@pytest.mark.functional
 def test_post_login_bad_password(test_app, test_user, ini_config):
     """ POST /login doesn't authenticate user w/ wrong password """
     response = test_app.post(
@@ -81,7 +83,6 @@ def test_post_login_bad_password(test_app, test_user, ini_config):
     assert response.headers.get('Set-Cookie') is None
 
 
-@pytest.mark.functional
 def test_post_login_bad_email(test_app, test_user):
     """ POST /login doesn't authenticate user w/ unregistered email """
     response = test_app.post(
@@ -96,7 +97,6 @@ def test_post_login_bad_email(test_app, test_user):
     assert response.headers.get('Set-Cookie') is None
 
 
-@pytest.mark.functional
 def test_post_login_empty(test_app, test_user):
     """ POST /login handles empty form submission  """
     response = test_app.post('/login', status=200)
