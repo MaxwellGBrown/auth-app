@@ -2,6 +2,8 @@ import pyramid.httpexceptions as http
 import pyramid.testing
 import pytest
 
+from auth_app.models import User, Session
+
 
 pytestmark = [
     pytest.mark.unit,
@@ -119,3 +121,24 @@ def test_post_login_no_credentials(test_config, ini_config):
 
     response = AuthViews(request).post_login()
     assert response == {}
+
+
+def test_post_login_clears_token(test_config, test_user):
+    """ LoginView.post_login clears User.token if it exists """
+    from auth_app.views.auth import AuthViews
+
+    user = User.one(user_id=test_user.user_id)
+    user.token = "abcdefg"
+    Session.add(user)
+    Session.commit()
+
+    request = pyramid.testing.DummyRequest(
+        post={
+            "email": test_user.email,
+            "password": test_user._unhashed_password
+        }
+    )
+
+    AuthViews(request).post_login()
+    Session.refresh(user)
+    assert user.token is None

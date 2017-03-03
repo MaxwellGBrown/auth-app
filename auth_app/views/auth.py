@@ -2,7 +2,7 @@ from pyramid.view import view_config, view_defaults
 import pyramid.httpexceptions as http
 from pyramid.security import remember, forget
 
-from auth_app.models import User
+from auth_app.models import User, Session
 
 
 @view_defaults(route_name="login", renderer="login.mako")
@@ -30,6 +30,11 @@ class AuthViews(object):
             return {}
 
         if user.validate(self.request.POST.get('password', '')) is True:
+            if user.token is not None:  # clear any outstanding tokens
+                user.token = None
+                Session.add(user)
+                Session.commit()
+
             headers = remember(self.request, user.user_id)
             return http.HTTPFound(
                 self.request.route_url('home'),
