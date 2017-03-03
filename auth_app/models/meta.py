@@ -1,6 +1,7 @@
 import pyramid.security as security
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
+import sqlalchemy.orm.exc as orm_exc
 
 
 Session = scoped_session(sessionmaker())
@@ -40,7 +41,10 @@ class AppBase(object):
         For more complex traversals, either override this method or define a
         new factory class.
         """
-        return cls.one(**request.matchdict)
+        try:
+            return cls.one(**request.matchdict)
+        except orm_exc.NoResultFound:
+            return None
 
 
 Base = declarative_base(cls=AppBase)

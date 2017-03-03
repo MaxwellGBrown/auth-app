@@ -1,6 +1,7 @@
 import pyramid.httpexceptions as http
 import pyramid.testing
 import pytest
+import sqlalchemy.orm.exc as orm_exc
 
 from auth_app.models import User
 
@@ -81,3 +82,36 @@ def test_create_user_required_arguments(test_config, alembic_head,
     UserManagementViews(request).create_user()
 
     assert len(User.all()) == count
+
+
+@pytest.mark.unit
+def test_delete_user(test_user, test_config):
+    """ UserManagementViews.delete_user removes user from DB """
+    from auth_app.views.admin import UserManagementViews
+
+    request = pyramid.testing.DummyRequest()
+    request.context = User.one(user_id=test_user.user_id)
+
+    count = len(User.all())
+
+    UserManagementViews(request).delete_user()
+
+    with pytest.raises(orm_exc.NoResultFound):
+        assert User.one(user_id=test_user.user_id)
+    assert count - 1 == len(User.all())
+
+
+@pytest.mark.unit
+def test_delete_nonexistant_user(test_config):
+    """ UserManagementViews.delete_user fails w/ nonexistant user """
+    from auth_app.views.admin import UserManagementViews
+
+    request = pyramid.testing.DummyRequest()
+    request.context = None
+
+    count = len(User.all())
+
+    with pytest.raises(orm_exc.UnmappedInstanceError):
+        UserManagementViews(request).delete_user()
+
+    assert count == len(User.all())

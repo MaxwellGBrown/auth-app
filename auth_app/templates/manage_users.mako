@@ -20,7 +20,7 @@
 </form>
 
 <h2>Users</h2>
-<ul>
+<ul id="user-list">
   % for user in users:
     <li>
 	  <b>${user.email}</b>
