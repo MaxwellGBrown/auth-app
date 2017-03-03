@@ -6,7 +6,7 @@
   </head>
 
   <body>
-  	${self.header()}
+	${self.navbar()}
     ${next.body(**context.kwargs)}
   </body>
 </html>
@@ -15,21 +15,48 @@
   Auth App  
 </%def>
 
-<%def name="header()">
-  ${self.auth()}
+<%def name="navbar()">
+  <ul>
+    % if request.has_permission("authenticated"):
+	<li>
+      Logged in as ${request.user.email}
+	  <ul>
+	  	<li>
+          <a href="${request.route_url('logout')}">Logout</a>
+		</li>
+	  </ul>
+	</li>
+
+    % else:
+	<li>
+	  <a href="${request.route_url('login')}">Log in</a>
+	</li>
+
+    % endif
+
+    <li>
+	  <a href="${request.route_url('index')}">Index</a>
+	</li>
+
+	% if request.has_permission("authenticated"):
+    <li>
+	  <a href="${request.route_url('home')}">Home</a>
+	</li>
+	% endif
+
+	% if request.has_permission("admin"):
+    <li>
+	  Admin
+	  <ul>
+	    <li>
+	      <a href="${request.route_url('manage_users')}">Users</a>
+	    </li>
+	  </ul>
+	</li>
+	% endif
+  </ul>
+
 </%def>
 
 <%def name="auth()">
-  % if request.user is not None:
-    <p>
-      Logged in as ${request.user.email}
-	  <a href="${request.route_url('logout')}">
-	    Logout
-	  </a>
-	</p>
-  % else:
-  	<a href="${request.route_url('login')}">
-	  Log in
-	</a>
-  % endif
 </%def>
