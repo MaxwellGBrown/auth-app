@@ -15,6 +15,7 @@ class User(Base):
     email = Column(Unicode(256), unique=True, nullable=False)
     user_type = Column(Unicode(16), nullable=False, default="basic")
 
+    token = Column(Unicode(32), unique=True, nullable=True, default=None)
     # @property = .password
     _password = Column('password', Unicode(128), nullable=False)
 
@@ -41,6 +42,11 @@ class User(Base):
         hashed_password = sha1(combined_password.encode("UTF-8"))
         passwords_match = self.password[40:] == hashed_password.hexdigest()
         return passwords_match
+
+    def reset(self):
+        """ Rehashes password as a random string and sets a token """
+        self.password = sha1(os.urandom(40))
+        self.token = sha1(os.urandom(40))
 
 
 class BasicUser(User):

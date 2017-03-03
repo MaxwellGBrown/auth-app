@@ -25,8 +25,10 @@ def upgrade():
         sa.Column('email', sa.Unicode(length=256), nullable=False),
         sa.Column('user_type', sa.Unicode(length=16), nullable=False),
         sa.Column('password', sa.Unicode(length=128), nullable=False),
+        sa.Column('token', sa.Unicode(length=32), nullable=True),
         sa.PrimaryKeyConstraint('user_id'),
-        sa.UniqueConstraint('email')
+        sa.UniqueConstraint('email'),
+        sa.UniqueConstraint('token')
     )
 
     op.bulk_insert(
