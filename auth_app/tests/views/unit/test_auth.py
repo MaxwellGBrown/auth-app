@@ -128,9 +128,6 @@ def test_post_login_clears_token(test_config, test_user):
     from auth_app.views.auth import AuthViews
 
     user = User.one(user_id=test_user.user_id)
-    user.token = "abcdefg"
-    Session.add(user)
-    Session.commit()
 
     request = pyramid.testing.DummyRequest(
         post={
@@ -142,3 +139,63 @@ def test_post_login_clears_token(test_config, test_user):
     AuthViews(request).post_login()
     Session.refresh(user)
     assert user.token is None
+
+
+def test_get_redeem_token(test_config, test_user):
+    """ RedeemTokenView.get_redeem_token works w/ valid User.token """
+    from auth_app.views.auth import RedeemTokenViews
+
+    request = pyramid.testing.DummyRequest()
+    request.context = test_user
+
+    RedeemTokenViews(request).get_redeem_token()
+
+
+def test_post_redeem_token_redirects_to_login(test_config, test_user,
+                                              new_user_kwargs):
+    """ RedeemTokenView.post_redeem_token clears token """
+    from auth_app.views.auth import RedeemTokenViews
+
+    user = User.one(user_id=test_user.user_id)
+
+    post = {k: v for k, v in new_user_kwargs.items() if k == "password"}
+    request = pyramid.testing.DummyRequest(post=post)
+    request.context = user
+
+    response = RedeemTokenViews(request).post_redeem_token()
+    assert isinstance(response, http.HTTPFound)
+    assert response.location == request.route_url('login')
+
+
+def test_post_redeem_token_clears_token(test_config, test_user,
+                                        new_user_kwargs):
+    """ RedeemTokenView.post_redeem_token clears token """
+    from auth_app.views.auth import RedeemTokenViews
+
+    user = User.one(user_id=test_user.user_id)
+
+    post = {k: v for k, v in new_user_kwargs.items() if k == "password"}
+    request = pyramid.testing.DummyRequest(post=post)
+    request.context = user
+
+    assert user.token is not None
+    RedeemTokenViews(request).post_redeem_token()
+    Session.refresh(user)
+    assert user.token is None
+
+
+def test_post_redeem_token_changes_password(test_config, test_user,
+                                            new_user_kwargs):
+    """ RedeemTokenView.post_redeem_token clears token """
+    from auth_app.views.auth import RedeemTokenViews
+
+    user = User.one(user_id=test_user.user_id)
+
+    post = {k: v for k, v in new_user_kwargs.items() if k == "password"}
+    request = pyramid.testing.DummyRequest(post=post)
+    request.context = user
+
+    assert user.validate(post["password"]) is False
+    RedeemTokenViews(request).post_redeem_token()
+    Session.refresh(user)
+    assert user.validate(post["password"]) is True

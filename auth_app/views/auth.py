@@ -51,7 +51,7 @@ class RedeemTokenViews(object):
         self.request = request
         self.user = request.context
 
-    @view_config(request_method="GET")
+    @view_config(request_method="GET", renderer="change_password.mako")
     def get_redeem_token(self):
         """ Show the set password screen """
         return {}

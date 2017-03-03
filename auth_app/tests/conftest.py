@@ -59,7 +59,8 @@ def test_user(request, ini_config, alembic_head, engine):
 
     user = app_model.User(
         email="test@example.com",
-        password="password123"
+        password="password123",
+        token="qwerty"
     )
     user._unhashed_password = "password123"
 
@@ -90,7 +91,8 @@ def test_admin(request, ini_config, alembic_head, engine):
     admin_user = app_model.AdminUser(
         email="admin@example.com",
         password="foobar12",
-        user_type="admin"
+        user_type="admin",
+        token="abcdefghijk"
     )
     admin_user._unhashed_password = "foobar12"
 
