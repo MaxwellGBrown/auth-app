@@ -1,5 +1,5 @@
 from .meta import Base, Session, AppBase  # noqa
-from .user import User, AdminUser  # noqa
+from .user import User, BasicUser, AdminUser  # noqa
 
 
 def bind_engine(engine, create_all=False):
