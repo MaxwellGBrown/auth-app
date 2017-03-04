@@ -85,3 +85,12 @@ def test_user_reset_changes_password(test_user):
     Session.commit()
     Session.refresh(user)
     assert user.validate(test_user._unhashed_password) is False
+
+
+def test_user_set_token_changes_token(test_user):
+    """ User.set_token() randomizes changes the users token """
+    user = User.one(user_id=test_user.user_id)
+    user.set_token()
+    assert user.token != test_user.token
+    assert user.token is not None
+    Session.commit()

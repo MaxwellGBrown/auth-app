@@ -1,6 +1,7 @@
 from pyramid.view import view_config, view_defaults
 import pyramid.httpexceptions as http
 from pyramid.security import remember, forget
+from sqlalchemy.orm.exc import NoResultFound
 
 from auth_app.models import User, Session
 
@@ -18,6 +19,18 @@ class AuthViews(object):
             headers=forget(self.request)
         )
 
+    @view_config(route_name="forgot_password", request_method="POST")
+    def forgot_password(self):
+        try:
+            user = User.one(email=self.request.POST.get('email'))
+        except NoResultFound:
+            return {}
+
+        user.set_token()
+        Session.add(user)
+        Session.commit()
+        return {}
+
     @view_config(request_method="GET")
     def get_login(self):
         return {}
@@ -26,7 +39,7 @@ class AuthViews(object):
     def post_login(self):
         try:
             user = User.one(email=self.request.POST.get('email'))
-        except:
+        except NoResultFound:
             return {}
 
         if user.validate(self.request.POST.get('password', '')) is True:

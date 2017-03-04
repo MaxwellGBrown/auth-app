@@ -43,10 +43,14 @@ class User(Base):
         passwords_match = self.password[40:] == hashed_password.hexdigest()
         return passwords_match
 
+    def set_token(self):
+        """ Sets a randomized User.token """
+        self.token = sha1(os.urandom(40)).hexdigest()
+
     def reset(self):
         """ Rehashes password as a random string and sets a token """
+        self.set_token()
         self.password = sha1(os.urandom(40)).hexdigest()
-        self.token = sha1(os.urandom(40)).hexdigest()
 
 
 class BasicUser(User):

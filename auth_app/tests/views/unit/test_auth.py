@@ -199,3 +199,28 @@ def test_post_redeem_token_changes_password(test_config, test_user,
     RedeemTokenViews(request).post_redeem_token()
     Session.refresh(user)
     assert user.validate(post["password"]) is True
+
+
+def test_forgot_password_sets_token(test_config, test_user):
+    """ AuthViews.forgot_password sets a new token """
+    from auth_app.views.auth import AuthViews
+
+    user = User.one(user_id=test_user.user_id)
+    request = pyramid.testing.DummyRequest(post={"email": user.email})
+
+    response = AuthViews(request).forgot_password()
+
+    assert user.token != test_user.token
+    assert user.token is not None
+    assert response == {}
+
+
+def test_forgot_password_nonexistant_user_returns_dict(test_config):
+    """ AuthViews.forgot_password handles bad email """
+    from auth_app.views.auth import AuthViews
+
+    request = pyramid.testing.DummyRequest(post={"email": "not@real"})
+
+    response = AuthViews(request).forgot_password()
+
+    assert response == {}

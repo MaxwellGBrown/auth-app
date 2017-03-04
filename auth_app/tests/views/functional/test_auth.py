@@ -149,14 +149,14 @@ def test_redeem_token(test_app, test_user):
 def test_get_redeem_with_bad_token(test_app):
     """ GET /redeem/<token> w/ non existant token 404s"""
 
-    response = test_app.get("/redeem/does_not_exist", status=404)
+    test_app.get("/redeem/does_not_exist", status=404)
 
 
 def test_post_redeem_with_bad_token(test_app):
     """ POST /redeem/<token> w/ non existant token 404s"""
 
-    response = test_app.post("/redeem/does_not_exist", status=404,
-        params={"password": "hello_world"})
+    test_app.post("/redeem/does_not_exist", status=404,
+                  params={"password": "hello_world"})
 
 
 def test_post_redeem_requires_password(test_app, test_user):
@@ -165,8 +165,30 @@ def test_post_redeem_requires_password(test_app, test_user):
     user = User.one(user_id=test_user.user_id)
 
     path = "/redeem/{}".format(user.token)
-    response = test_app.post(path, params={}, status=200)
+    test_app.post(path, params={}, status=200)
 
     Session.refresh(user)
     assert user.token == test_user.token
     assert user.validate(test_user._unhashed_password) is True
+
+
+def test_post_forgot_password(test_app, test_user):
+    """ POST /forgot_password sets token """
+
+    user = User.one(user_id=test_user.user_id)
+
+    test_app.post('/forgot_password', params={"email": user.email}, status=200)
+
+    Session.refresh(user)
+    assert user.token != test_user.token
+    assert user.token is not None
+
+
+def test_post_forgot_password_bad_email(test_app):
+    """ POST /forgot_password 200s with bad email & stuff """
+    test_app.post('/forgot_password', params={"email": "lkjasdflk"})
+
+
+def test_post_forgot_password_no_email(test_app):
+    """ POST /forgot_password 200s with no email """
+    test_app.post('/forgot_password', status=200)

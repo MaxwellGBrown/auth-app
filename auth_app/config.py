@@ -28,11 +28,14 @@ def configure(config, **settings):
 
     # standard routes
     config.add_route('index', '/')
+    config.add_route('home', '/home')
+
+    # auth routes
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
+    config.add_route('forgot_password', '/forgot_password')
     config.add_route('redeem', '/redeem/{token}',
                      factory=app_model.User.route_factory)
-    config.add_route('home', '/home')
 
     # /admin/users
     config.add_route('manage_users', '/admin/users')
