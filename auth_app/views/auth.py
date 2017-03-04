@@ -44,14 +44,15 @@ class AuthViews(object):
             return {}
 
 
-@view_defaults(route_name="redeem", context=User)
+@view_defaults(route_name="redeem", context=User,
+               renderer="change_password.mako")
 class RedeemTokenViews(object):
 
     def __init__(self, request):
         self.request = request
         self.user = request.context
 
-    @view_config(request_method="GET", renderer="change_password.mako")
+    @view_config(request_method="GET")
     def get_redeem_token(self):
         """ Show the set password screen """
         return {}
@@ -59,8 +60,12 @@ class RedeemTokenViews(object):
     @view_config(request_method="POST")
     def post_redeem_token(self):
         """ Clear the token and set the posted password """
+
+        if self.request.POST.get("password") is None:
+            return {}
+
         self.user.token = None
-        self.user.password = self.request.POST.get("password")
+        self.user.password = self.request.POST.get("password", "")
         Session.add(self.user)
         Session.commit()
 

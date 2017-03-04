@@ -144,3 +144,29 @@ def test_redeem_token(test_app, test_user):
     assert user.token is None
     assert user.validate("new_password") is True
     assert user.validate(test_user._unhashed_password) is False
+
+
+def test_get_redeem_with_bad_token(test_app):
+    """ GET /redeem/<token> w/ non existant token 404s"""
+
+    response = test_app.get("/redeem/does_not_exist", status=404)
+
+
+def test_post_redeem_with_bad_token(test_app):
+    """ POST /redeem/<token> w/ non existant token 404s"""
+
+    response = test_app.post("/redeem/does_not_exist", status=404,
+        params={"password": "hello_world"})
+
+
+def test_post_redeem_requires_password(test_app, test_user):
+    """ POST /redeem/<token> w/o password fails """
+
+    user = User.one(user_id=test_user.user_id)
+
+    path = "/redeem/{}".format(user.token)
+    response = test_app.post(path, params={}, status=200)
+
+    Session.refresh(user)
+    assert user.token == test_user.token
+    assert user.validate(test_user._unhashed_password) is True
