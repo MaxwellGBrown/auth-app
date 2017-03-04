@@ -37,8 +37,8 @@ def test_post_create_user(test_app, as_test_admin, new_user_kwargs):
 
     new_user = User.one(email=new_user_kwargs['email'])
     assert new_user
-    assert new_user.validate(new_user_kwargs['password'])
     assert new_user.user_type == new_user_kwargs['user_type']
+    assert new_user.token is not None
 
 
 def test_post_create_user_unauthorized(test_app, as_test_user,

@@ -45,8 +45,8 @@ class User(Base):
 
     def reset(self):
         """ Rehashes password as a random string and sets a token """
-        self.password = sha1(os.urandom(40))
-        self.token = sha1(os.urandom(40))
+        self.password = sha1(os.urandom(40)).hexdigest()
+        self.token = sha1(os.urandom(40)).hexdigest()
 
 
 class BasicUser(User):

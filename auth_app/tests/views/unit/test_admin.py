@@ -67,7 +67,7 @@ def test_create_user_email_unique(test_config, alembic_head, new_user_kwargs,
     assert len(User.all()) == count
 
 
-@pytest.mark.parametrize("missing_kwargs", ["email", "password"])
+@pytest.mark.parametrize("missing_kwargs", ["email"])
 def test_create_user_required_arguments(test_config, alembic_head,
                                         new_user_kwargs, missing_kwargs):
     """ UserManagementViews.create_user fails when missing required values """

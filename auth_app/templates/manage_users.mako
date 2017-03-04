@@ -8,9 +8,6 @@
   <label for="email">Email</label>
   <input name="email"/>
 
-  <label for="password">Password</label>
-  <input type="password" name="password"/>
-
   <select name="user_type">
     <option value="basic" selected>User</option>
     <option value="admin">Admin</option>

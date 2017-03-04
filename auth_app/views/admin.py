@@ -17,6 +17,7 @@ class UserManagementViews(object):
     @view_config(route_name="create_user", request_method="POST")
     def create_user(self):
         new_user = User(**self.request.POST)
+        new_user.reset()  # randomize password and create token
         Session.add(new_user)
         try:
             Session.commit()
