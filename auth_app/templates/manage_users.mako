@@ -17,13 +17,37 @@
 </form>
 
 <h2>Users</h2>
-<ul id="user-list">
+
+<table id="user-table">
+  <tr>
+    <th>Id</th>
+	<th>Type</th>
+    <th>Email</th>
+	<th>Token</th>
+	<th>Delete</th>
+  </tr>
+
   % for user in users:
-    <li>
-	  <b>${user.email}</b>
-	  <a href="${request.route_url('delete_user', user_id=user.user_id)}">
-	    delete
-	  </a>
-	</li>
+    ${row(user)}
   % endfor
-</ul>
+</table>
+
+<%def name="row(user)">
+<tr>
+  <td>${user.user_id}</td>
+  <td>${user.user_type}</td>
+  <td>${user.email}</td>
+  
+  % if user.token is not None:
+  <td>${request.route_url('redeem', token=user.token)}</td>
+  % else:
+  <td></td>
+  % endif
+  
+  <td>
+    <a href="${request.route_url('delete_user', user_id=user.user_id)}">
+	  delete
+	</a>
+  </td>
+</tr>
+</%def>

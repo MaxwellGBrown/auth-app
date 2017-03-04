@@ -64,7 +64,7 @@ def test_get_delete_user(test_app, as_test_admin, test_user):
     redirect = response.follow()
     assert redirect.status == '200 OK'
 
-    assert test_user.email not in redirect.html.find(id="user-list")
+    assert test_user.email not in redirect.html.find(id="user-table")
 
 
 def test_post_delete_user_unauthenticated(test_app, test_user):
