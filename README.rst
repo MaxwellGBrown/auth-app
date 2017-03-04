@@ -46,7 +46,12 @@ Getting Started
       $ pserve development.ini
 
 
-The application comes pre-setup with the user ``admin@localhost`` w/ the password ``hunter2``.
+#. Set the password for ``admin@localhost`` to gain access to admin account
+
+   ::
+
+       http://localhost:8643/redeem/init
+
 
 
 Caution for Deployment

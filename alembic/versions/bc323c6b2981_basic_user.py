@@ -36,14 +36,14 @@ def upgrade():
         [
             {
                 'email': 'admin@localhost',
-                # password: 'hunter2'
-                'password': '2ba752e09466b4084f96fa6b17a3f90da4a3e62604818727a'
-                            '14ee12941ced75a2eb988c46727df00',
-                'user_type': 'admin'
+                'password': '5ac50327a716fc21464752fe9080adfb294ebaa4b3aa5272d'
+                            'd7b3ec6c67bb614a5cea5eefbf72c06',
+                'user_type': 'admin',
+                'token': 'init'
             }
         ]
     )
-    
+
     # ### end Alembic commands ###
 
 
