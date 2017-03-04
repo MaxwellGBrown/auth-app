@@ -64,3 +64,24 @@ def test_user_validate_password_failure(test_user):
     User.validate returns False if unhashed password doesn't match hashed pass
     """
     assert test_user.validate("BAD PASSWORD") is False
+
+
+def test_user_reset_changes_token(test_user):
+    """ User.reset() changes the users token """
+    user = User.one(user_id=test_user.user_id)
+    user.reset()
+    Session.add(user)
+    Session.commit()
+    Session.refresh(user)
+    assert user.token != test_user.token
+    assert user.token is not None
+
+
+def test_user_reset_changes_password(test_user):
+    """ User.reset changes the users password """
+    user = User.one(user_id=test_user.user_id)
+    user.reset()
+    Session.add(user)
+    Session.commit()
+    Session.refresh(user)
+    assert user.validate(test_user._unhashed_password) is False
