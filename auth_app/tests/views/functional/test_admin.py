@@ -1,7 +1,7 @@
 import pytest
 import sqlalchemy.orm.exc as orm_exc
 
-from auth_app.models import User
+from auth_app.models import User, Session
 
 
 pytestmark = [
@@ -15,10 +15,24 @@ def test_get_manage_users(test_app, as_test_admin):
     """ GET /admin/users 200 shows all users while auth as an admin """
     response = test_app.get('/admin/users', status=200)
 
-    all_users = User.all()
+    all_users = {u.user_id: u for u in User.all()}
 
-    for user in all_users:
-        assert user.email in response
+    user_table = response.html.find(id="user-table")
+    assert user_table
+
+    for row in user_table.select('tbody > tr'):
+        user_cell = row.select('td:nth-of-type(1)')[0]
+        user_id = int(user_cell.text.strip())
+        user = all_users[user_id]
+
+        # so I can just do <str> in row
+        row = str(row)
+
+        assert user.email in row
+        if user.token:
+            assert user.token in row
+        assert '/admin/users/delete/{}'.format(user_id) in row
+        assert '/admin/users/reset/{}'.format(user_id) in row
 
 
 def test_get_manage_users_unauthenticated(test_app):
@@ -85,3 +99,55 @@ def test_get_delete_user_nonexistant(test_app, as_test_admin):
     """ POST /admin/users/delete/<id> 404's if user doesn't exist """
 
     test_app.post('/admin/users/delete/9999', status=404)
+
+
+def test_reset_user(test_app, as_test_admin, test_user):
+    """
+    GET /admin/users/reset/<id> resets associated users password & sets token
+    """
+    user = User.one(user_id=test_user.user_id)
+
+    response = test_app.get('/admin/users/reset/{}'.format(test_user.user_id))
+    assert response.location.endswith('/admin/users')
+
+    Session.refresh(user)
+
+    assert user.token != test_user.token
+    assert user.token is not None
+    assert user.validate(test_user._unhashed_password) is False
+
+
+def test_reset_nonexistant_user(test_app, as_test_admin):
+    """ GET /admin/users/reset/<id> 404's on nonexistant user """
+
+    test_app.get('/admin/users/reset/999', status=404)
+
+
+def test_reset_user_unauthenticated(test_app, test_user):
+    """ GET /admin/users/reset/<id> 403's while unauthenticated """
+
+    user = User.one(user_id=test_user.user_id)
+
+    test_app.get(
+        '/admin/users/reset/{}'.format(test_user.user_id), status=403
+    )
+
+    Session.refresh(user)
+
+    assert user.token == test_user.token
+    assert user.validate(test_user._unhashed_password) is True
+
+
+def test_reset_user_unauthorized(test_app, test_admin, as_test_user):
+    """ GET /admin/users/reset/<id> 403's if unauthorized """
+
+    user = User.one(user_id=test_admin.user_id)
+
+    test_app.get(
+        '/admin/users/reset/{}'.format(test_admin.user_id), status=403
+    )
+
+    Session.refresh(user)
+
+    assert user.token == test_admin.token
+    assert user.validate(test_admin._unhashed_password) is True

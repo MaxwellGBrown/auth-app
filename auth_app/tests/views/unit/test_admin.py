@@ -3,7 +3,7 @@ import pyramid.testing
 import pytest
 import sqlalchemy.orm.exc as orm_exc
 
-from auth_app.models import User
+from auth_app.models import User, Session
 
 
 pytestmark = [
@@ -112,3 +112,48 @@ def test_delete_nonexistant_user(test_config):
         UserManagementViews(request).delete_user()
 
     assert count == len(User.all())
+
+
+def test_reset_user_sets_token(test_config, test_user):
+    """ UserManagementViews.reset_user sets token """
+    from auth_app.views.admin import UserManagementViews
+
+    user = User.one(user_id=test_user.user_id)
+
+    request = pyramid.testing.DummyRequest()
+    request.context = user
+
+    UserManagementViews(request).reset_user()
+
+    Session.refresh(user)
+    assert user.token != test_user.token
+    assert user.token is not None
+
+
+def test_reset_user_changes_password(test_config, test_user):
+    """ UserManagementViews.reset_user changes password """
+    from auth_app.views.admin import UserManagementViews
+
+    user = User.one(user_id=test_user.user_id)
+
+    request = pyramid.testing.DummyRequest()
+    request.context = user
+
+    UserManagementViews(request).reset_user()
+
+    Session.refresh(user)
+    assert user.validate(test_user._unhashed_password) is False
+
+
+def test_reset_user_redirects_to_user_management(test_config, test_user):
+    """ UserManagementViews.reset_user returns HTTPFound """
+    from auth_app.views.admin import UserManagementViews
+
+    user = User.one(user_id=test_user.user_id)
+
+    request = pyramid.testing.DummyRequest()
+    request.context = user
+
+    response = UserManagementViews(request).reset_user()
+    assert isinstance(response, http.HTTPFound)
+    assert response.location == request.route_url('manage_users')

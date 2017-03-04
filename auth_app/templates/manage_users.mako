@@ -19,17 +19,21 @@
 <h2>Users</h2>
 
 <table id="user-table">
-  <tr>
-    <th>Id</th>
-	<th>Type</th>
-    <th>Email</th>
-	<th>Token</th>
-	<th>Delete</th>
-  </tr>
+  <thead>
+    <tr>
+      <th>Id</th>
+      <th>Type</th>
+      <th>Email</th>
+      <th>Token</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
 
-  % for user in users:
-    ${row(user)}
-  % endfor
+  <tbody>
+    % for user in users:
+      ${row(user)}
+    % endfor
+  </tbody>
 </table>
 
 <%def name="row(user)">
@@ -47,6 +51,9 @@
   <td>
     <a href="${request.route_url('delete_user', user_id=user.user_id)}">
 	  delete
+	</a>
+	<a href="${request.route_url('reset_user', user_id=user.user_id)}">
+	  reset
 	</a>
   </td>
 </tr>
