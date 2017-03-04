@@ -37,6 +37,8 @@ def configure(config, **settings):
     # /admin/users
     config.add_route('manage_users', '/admin/users')
     config.add_route('create_user', '/admin/users/create')
+    config.add_route('reset_user', '/admin/users/reset/{user_id}',
+                     factory=app_model.User.route_factory)
     config.add_route('delete_user', '/admin/users/delete/{user_id}',
                      factory=app_model.User.route_factory)
 

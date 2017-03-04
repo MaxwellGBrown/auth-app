@@ -30,3 +30,10 @@ class UserManagementViews(object):
         Session.delete(self.request.context)
         Session.commit()
         return http.HTTPFound(self.request.route_url("manage_users"))
+
+    @view_config(route_name="reset_user", context=User)
+    def reset_user(self):
+        self.request.context.reset()
+        Session.add(self.request.context)
+        Session.commit()
+        return http.HTTPFound(self.request.route_url("manage_users"))
