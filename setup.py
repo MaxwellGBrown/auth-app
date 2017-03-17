@@ -1,14 +1,9 @@
 from setuptools import setup
 
-requires = [
-    'alembic',
-    'mako',
-    'pyramid_mako',
-    'pyramid',
-    'pytest',
-    'sqlalchemy',
-    'webtest'
-]
+
+with open('requirements.txt') as requirements_file:
+    requires = requirements_file.read().splitlines()
+
 
 setup(
     name="auth_app",

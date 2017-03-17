@@ -4,50 +4,53 @@ Auth App
 
 This application is a basic setup for authentication & authorization in a `pyramid <https://trypyramid.com/>`__ application.
 
-It's main purpose is to both be an example of how to implement both these features and as a repo to fork off of for applications that may want to include these features.
+Auth App also comes with a Dockerfile so it can be deployed using `docker <https://docker.com>`__.
 
-This application includes:
+Auth App comes complete with...
 
-* Creating a user model
-* Hooking the user model into pyramid authentication
-* Implementing basic authorization to views
-* Performing unit & functional tests on views with authentication & authorization
-
-
-
-Quickstart
-----------
+* A basic User SQLAlchemy model with password hashing & token recovery
+* Pyramid authentication & authorization using the SQLAlchemy User model
+* Unit & Functional tests on an authentication & authorization app using pytest
+* A Dockerfile for application development and deployment
 
 
-#. Use ``setup.py`` to install the application
+Development Quickstart
+----------------------
+
+Auth App comes packaged with a Dockerfile which can be used for deployment.
+
+To begin, make sure that `docker is installed <https://www.docker.com/get-docker>`__.
+
+#. Build the docker image using the Dockerfile
 
    ::
    
-      $ python setup.py develop
-
-   OR
-
-   ::
-
-      $ python setup.py install
+     $ docker build -t auth-app .
 
 
-#. Set up the database & application model using `alembic <http://alembic.zzzcomputing.com/en/latest/>`__
+#. Create & migrate the database specified in ``development.ini`` under ``[app:main]``'s ``sqlalchemy.url``
 
    ::
 
-      $ alembic -c development.ini upgrade head
+     $ docker run auth-app alembic -c development.ini upgrade head
 
 
-#. Serve the application using pserve
-   
-   ::
-
-      $ pserve development.ini
-
-
-#. Set the password for ``admin@localhost`` to gain access to admin account
+#. Mount the app directory as a volume and serve the app!
 
    ::
 
-       http://localhost:8643/redeem/init
+     $ docker run -it -v $(pwd):/auth-app -p 8643:80 auth-app 
+
+
+Running Tests
+-------------
+
+Auth App uses `pytest <http://doc.pytest.org/en/latest/>`__ to run it's unit tests and some functional tests.
+
+After building, make sure that the ``sqlalchemy.url`` in ``test.ini`` is setup so that tests can reference it.
+
+To run the pytest fixtures & tests, run...
+
+::
+
+  $ docker run -it auth-app py.test
