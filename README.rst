@@ -42,6 +42,13 @@ To begin, make sure that `docker is installed <https://www.docker.com/get-docker
      $ docker run -it -v $(pwd):/auth-app -p 8643:80 auth-app 
 
 
+#. Set the password for the initial admin account ``admin@localhost`` (if it hasn't already been set up)
+
+   ::
+
+     http://localhost:8643/redeem/init
+
+
 Running Tests
 -------------
 
