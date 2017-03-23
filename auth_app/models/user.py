@@ -1,4 +1,4 @@
-from hashlib import sha1
+from hashlib import sha256
 import os
 
 from sqlalchemy import Column, Unicode, Integer
@@ -31,26 +31,26 @@ class User(Base):
     @password.setter
     def set_password(self, password):
         # password arg is assumed UTF-8
-        salt = sha1(os.urandom(40))
+        salt = sha256(os.urandom(64))
         salted_pwd = password + salt.hexdigest()
-        sha1_hash = sha1(salted_pwd.encode("UTF-8"))
-        self._password = salt.hexdigest() + sha1_hash.hexdigest()
+        sha256_hash = sha256(salted_pwd.encode("UTF-8"))
+        self._password = salt.hexdigest() + sha256_hash.hexdigest()
 
     def validate(self, password):
         """ Returns True if `password` matches unhashed User._password """
-        combined_password = password + self.password[:40]
-        hashed_password = sha1(combined_password.encode("UTF-8"))
-        passwords_match = self.password[40:] == hashed_password.hexdigest()
+        combined_password = password + self.password[:64]
+        hashed_password = sha256(combined_password.encode("UTF-8"))
+        passwords_match = self.password[64:] == hashed_password.hexdigest()
         return passwords_match
 
     def set_token(self):
         """ Sets a randomized User.token """
-        self.token = sha1(os.urandom(40)).hexdigest()
+        self.token = sha256(os.urandom(64)).hexdigest()
 
     def reset(self):
         """ Rehashes password as a random string and sets a token """
         self.set_token()
-        self.password = sha1(os.urandom(40)).hexdigest()
+        self.password = sha256(os.urandom(64)).hexdigest()
 
 
 class BasicUser(User):
