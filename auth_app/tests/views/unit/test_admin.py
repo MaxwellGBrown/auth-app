@@ -1,5 +1,4 @@
 import pyramid.httpexceptions as http
-import pyramid.testing
 import pytest
 import sqlalchemy.orm.exc as orm_exc
 
@@ -19,7 +18,7 @@ def test_get_manage_user(test_config, alembic_head):
 
     all_users = User.all()
 
-    request = pyramid.testing.DummyRequest()
+    request = test_config.DummyRequest()
     response = UserManagementViews(request).manage_users()
 
     assert "users" in response
@@ -30,7 +29,7 @@ def test_create_user_redirects(test_config, alembic_head, new_user_kwargs):
     """ UserManagementViews.create_user redirects """
     from auth_app.views.admin import UserManagementViews
 
-    request = pyramid.testing.DummyRequest(params=new_user_kwargs)
+    request = test_config.DummyRequest(params=new_user_kwargs)
     response = UserManagementViews(request).create_user()
 
     assert isinstance(response, http.HTTPFound)
@@ -44,7 +43,7 @@ def test_create_user_makes_user(test_config, alembic_head, new_user_kwargs):
     results = User.all(email=new_user_kwargs['email'])
     assert len(results) == 0
 
-    request = pyramid.testing.DummyRequest(params=new_user_kwargs)
+    request = test_config.DummyRequest(post=new_user_kwargs)
     UserManagementViews(request).create_user()
 
     new_user = User.one(email=new_user_kwargs['email'])
@@ -61,7 +60,7 @@ def test_create_user_email_unique(test_config, alembic_head, new_user_kwargs,
 
     count = len(User.all())
 
-    request = pyramid.testing.DummyRequest(params=new_user_kwargs)
+    request = test_config.DummyRequest(params=new_user_kwargs)
     UserManagementViews(request).create_user()
 
     assert len(User.all()) == count
@@ -77,7 +76,7 @@ def test_create_user_required_arguments(test_config, alembic_head,
 
     new_user_kwargs.pop(missing_kwargs)
 
-    request = pyramid.testing.DummyRequest(params=new_user_kwargs)
+    request = test_config.DummyRequest(params=new_user_kwargs)
     UserManagementViews(request).create_user()
 
     assert len(User.all()) == count
@@ -87,7 +86,7 @@ def test_delete_user(test_user, test_config):
     """ UserManagementViews.delete_user removes user from DB """
     from auth_app.views.admin import UserManagementViews
 
-    request = pyramid.testing.DummyRequest()
+    request = test_config.DummyRequest()
     request.context = User.one(user_id=test_user.user_id)
 
     count = len(User.all())
@@ -103,7 +102,7 @@ def test_delete_nonexistant_user(test_config):
     """ UserManagementViews.delete_user fails w/ nonexistant user """
     from auth_app.views.admin import UserManagementViews
 
-    request = pyramid.testing.DummyRequest()
+    request = test_config.DummyRequest()
     request.context = None
 
     count = len(User.all())
@@ -120,7 +119,7 @@ def test_reset_user_sets_token(test_config, test_user):
 
     user = User.one(user_id=test_user.user_id)
 
-    request = pyramid.testing.DummyRequest()
+    request = test_config.DummyRequest()
     request.context = user
 
     UserManagementViews(request).reset_user()
@@ -136,7 +135,7 @@ def test_reset_user_changes_password(test_config, test_user):
 
     user = User.one(user_id=test_user.user_id)
 
-    request = pyramid.testing.DummyRequest()
+    request = test_config.DummyRequest()
     request.context = user
 
     UserManagementViews(request).reset_user()
@@ -151,7 +150,7 @@ def test_reset_user_redirects_to_user_management(test_config, test_user):
 
     user = User.one(user_id=test_user.user_id)
 
-    request = pyramid.testing.DummyRequest()
+    request = test_config.DummyRequest()
     request.context = user
 
     response = UserManagementViews(request).reset_user()
