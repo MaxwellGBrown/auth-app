@@ -36,6 +36,11 @@ class User(Base):
         sha256_hash = sha256(salted_pwd.encode("UTF-8"))
         self._password = salt.hexdigest() + sha256_hash.hexdigest()
 
+    def __repr__(self):
+        return "<{}(user_id={!r}, email={!r}, user_type={!r}, token={!r})>"\
+               .format(self.__class__.__name__, self.user_id,
+                       self.email, self.user_type, self.token)
+
     def validate(self, password):
         """ Returns True if `password` matches unhashed User._password """
         combined_password = password + self.password[:64]
