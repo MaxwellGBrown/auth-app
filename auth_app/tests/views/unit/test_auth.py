@@ -1,5 +1,4 @@
 import pyramid.httpexceptions as http
-import pyramid.testing
 import pytest
 
 from auth_app.models import User, Session
@@ -16,7 +15,7 @@ def test_get_login(test_config):
     """ AuthViews.get_login returns {} """
     from auth_app.views.auth import AuthViews
 
-    request = pyramid.testing.DummyRequest()
+    request = test_config.DummyRequest()
 
     assert AuthViews(request).get_login() == {}
 
@@ -27,7 +26,7 @@ def test_logout(test_config, ini_config):
 
     cookie_name = ini_config['app:main']['auth.cookie_name']
 
-    request = pyramid.testing.DummyRequest(
+    request = test_config.DummyRequest(
         cookies=[(cookie_name, 'DELETE_ME')]
     )
 
@@ -41,7 +40,7 @@ def test_post_login(test_config, test_user, ini_config):
     """ AuthViews.post_login success redirects to index w/ cookies """
     from auth_app.views.auth import AuthViews
 
-    request = pyramid.testing.DummyRequest(
+    request = test_config.DummyRequest(
         post={
             "email": test_user.email,
             "password": test_user._unhashed_password
@@ -59,7 +58,7 @@ def test_post_login_bad_password(test_config, test_user, ini_config):
     """ LoginView.post_login fails authorization w/ bad password """
     from auth_app.views.auth import AuthViews
 
-    request = pyramid.testing.DummyRequest(
+    request = test_config.DummyRequest(
         post={
             "email": test_user.email,
             "password": "BAD PASSWORD"
@@ -74,7 +73,7 @@ def test_post_login_no_password(test_config, test_user, ini_config):
     """ LoginView.post_login fails authorization w/ no password """
     from auth_app.views.auth import AuthViews
 
-    request = pyramid.testing.DummyRequest(
+    request = test_config.DummyRequest(
         post={
             "email": test_user.email
         }
@@ -88,7 +87,7 @@ def test_post_login_no_email(test_config, test_user, ini_config):
     """ LoginView.post_login fails authorization w/ no email """
     from auth_app.views.auth import AuthViews
 
-    request = pyramid.testing.DummyRequest(
+    request = test_config.DummyRequest(
         post={
             "password": "anything"
         }
@@ -102,7 +101,7 @@ def test_post_login_bad_email(test_config, test_user, ini_config):
     """ LoginView.post_login fails authorizationw w/ bad email """
     from auth_app.views.auth import AuthViews
 
-    request = pyramid.testing.DummyRequest(
+    request = test_config.DummyRequest(
         post={
             "email": "bad@fail.com",
             "password": test_user._unhashed_password
@@ -117,7 +116,7 @@ def test_post_login_no_credentials(test_config, ini_config):
     """ LoginView.post_login fails authorization w/ no credentials """
     from auth_app.views.auth import AuthViews
 
-    request = pyramid.testing.DummyRequest()
+    request = test_config.DummyRequest()
 
     response = AuthViews(request).post_login()
     assert response == {}
@@ -129,7 +128,7 @@ def test_post_login_clears_token(test_config, test_user):
 
     user = User.one(user_id=test_user.user_id)
 
-    request = pyramid.testing.DummyRequest(
+    request = test_config.DummyRequest(
         post={
             "email": test_user.email,
             "password": test_user._unhashed_password
@@ -145,7 +144,7 @@ def test_get_redeem_token(test_config, test_user):
     """ RedeemTokenView.get_redeem_token works w/ valid User.token """
     from auth_app.views.auth import RedeemTokenViews
 
-    request = pyramid.testing.DummyRequest()
+    request = test_config.DummyRequest()
     request.context = test_user
 
     RedeemTokenViews(request).get_redeem_token()
@@ -159,7 +158,7 @@ def test_post_redeem_token_redirects_to_login(test_config, test_user,
     user = User.one(user_id=test_user.user_id)
 
     post = {k: v for k, v in new_user_kwargs.items() if k == "password"}
-    request = pyramid.testing.DummyRequest(post=post)
+    request = test_config.DummyRequest(post=post)
     request.context = user
 
     response = RedeemTokenViews(request).post_redeem_token()
@@ -175,7 +174,7 @@ def test_post_redeem_token_clears_token(test_config, test_user,
     user = User.one(user_id=test_user.user_id)
 
     post = {k: v for k, v in new_user_kwargs.items() if k == "password"}
-    request = pyramid.testing.DummyRequest(post=post)
+    request = test_config.DummyRequest(post=post)
     request.context = user
 
     assert user.token is not None
@@ -192,7 +191,7 @@ def test_post_redeem_token_changes_password(test_config, test_user,
     user = User.one(user_id=test_user.user_id)
 
     post = {k: v for k, v in new_user_kwargs.items() if k == "password"}
-    request = pyramid.testing.DummyRequest(post=post)
+    request = test_config.DummyRequest(post=post)
     request.context = user
 
     assert user.validate(post["password"]) is False
@@ -206,7 +205,7 @@ def test_forgot_password_sets_token(test_config, test_user):
     from auth_app.views.auth import AuthViews
 
     user = User.one(user_id=test_user.user_id)
-    request = pyramid.testing.DummyRequest(post={"email": user.email})
+    request = test_config.DummyRequest(post={"email": user.email})
 
     response = AuthViews(request).forgot_password()
 
@@ -219,7 +218,7 @@ def test_forgot_password_nonexistant_user_returns_dict(test_config):
     """ AuthViews.forgot_password handles bad email """
     from auth_app.views.auth import AuthViews
 
-    request = pyramid.testing.DummyRequest(post={"email": "not@real"})
+    request = test_config.DummyRequest(post={"email": "not@real"})
 
     response = AuthViews(request).forgot_password()
 

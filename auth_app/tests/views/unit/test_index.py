@@ -1,4 +1,3 @@
-import pyramid.testing
 import pytest
 
 
@@ -12,6 +11,6 @@ def test_index(test_config):
     """ index(request) == {} """
     from auth_app.views.index import index
 
-    request = pyramid.testing.DummyRequest()
+    request = test_config.DummyRequest()
 
     assert index(request) == {}
