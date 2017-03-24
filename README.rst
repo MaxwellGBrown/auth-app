@@ -39,7 +39,7 @@ To begin, make sure that `docker is installed <https://www.docker.com/get-docker
 
    ::
 
-     $ docker run -it -v $(pwd):/auth-app -p 8643:80 auth-app 
+     $ docker run -it -v $(pwd):/auth-app -p 8643:80 -d --name auth-app auth-app
 
 
 #. Set the password for the initial admin account ``admin@localhost`` (if it hasn't already been set up)
@@ -61,3 +61,10 @@ To run the pytest fixtures & tests, run...
 ::
 
   $ docker run -it auth-app py.test
+
+
+To run the pytest fixtures on a detached dev container, use ``docker exec``
+
+::
+
+  $ docker exec -it auth-app py.test
