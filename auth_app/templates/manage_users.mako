@@ -1,17 +1,16 @@
 <%inherit file="base.mako"/>
-<%page args="request, users=list(), **kwargs" />
+<%page args="request, users, create_user_form, **kwargs" />
 
 <h1>User Management</h1>
 
 <h2>Create User</h2>
 <form action="${request.route_url('create_user')}" method="POST">
-  <label for="email">Email</label>
-  <input name="email"/>
+  
+  ${create_user_form.email.label}
+  ${create_user_form.email()}
 
-  <select name="user_type">
-    <option value="basic" selected>User</option>
-    <option value="admin">Admin</option>
-  </select>
+  ${create_user_form.user_type.label}
+  ${create_user_form.user_type}
 
   <input type="submit" value="Submit"/>
 </form>
