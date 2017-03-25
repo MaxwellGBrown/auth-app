@@ -1,31 +1,13 @@
 <%inherit file="base.mako"/>
-<%page args="request, users, create_user_form, **kwargs" />
+<%page args="request, users, create_user_form, **kwargs"/>
+<%namespace name="forms" file="utils/forms.mako"/>
 
 <h1>User Management</h1>
 
 <h2>Create User</h2>
 <form action="${request.route_url('create_user')}" method="POST">
-  
-  ${create_user_form.email.label}
-  ${create_user_form.email()}
-  % if create_user_form.email.errors:
-    <ul>
-	  % for error in create_user_form.email.errors:
-	    <li>error</li>
-	  % endfor
-	</ul>
-  % endif
-
-  ${create_user_form.user_type.label}
-  ${create_user_form.user_type}
-  % if create_user_form.email.errors:
-    <ul>
-	  % for error in create_user_form.user_type.errors:
-	    <li>error</li>
-	  % endfor
-	</ul>
-  % endif
-
+  ${forms.render_field(create_user_form.email)}
+  ${forms.render_field(create_user_form.user_type)}
   <input type="submit" value="Submit"/>
 </form>
 
