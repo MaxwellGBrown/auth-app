@@ -8,9 +8,23 @@
   
   ${create_user_form.email.label}
   ${create_user_form.email()}
+  % if create_user_form.email.errors:
+    <ul>
+	  % for error in create_user_form.email.errors:
+	    <li>error</li>
+	  % endfor
+	</ul>
+  % endif
 
   ${create_user_form.user_type.label}
   ${create_user_form.user_type}
+  % if create_user_form.email.errors:
+    <ul>
+	  % for error in create_user_form.user_type.errors:
+	    <li>error</li>
+	  % endfor
+	</ul>
+  % endif
 
   <input type="submit" value="Submit"/>
 </form>
