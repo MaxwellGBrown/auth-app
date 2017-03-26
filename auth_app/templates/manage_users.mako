@@ -5,7 +5,7 @@
 <h1>User Management</h1>
 
 <h2>Create User</h2>
-<form action="${request.route_url('create_user')}" method="POST">
+<form id="create-user-form" action="${request.route_url('create_user')}" method="POST">
   ${forms.render_field(create_user_form.email)}
   ${forms.render_field(create_user_form.user_type)}
   <input type="submit" value="Submit"/>

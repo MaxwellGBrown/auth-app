@@ -3,11 +3,13 @@ import pytest
 import sqlalchemy.orm.exc as orm_exc
 
 from auth_app.models import User, Session
+from auth_app.forms import CreateUserForm
 
 
 pytestmark = [
     pytest.mark.unit,
     pytest.mark.views,
+    pytest.mark.admin,
     pytest.mark.usefixtures("rollback")
 ]
 
@@ -23,6 +25,18 @@ def test_get_manage_user(test_config, alembic_head):
 
     assert "users" in response
     assert response["users"] == all_users
+
+
+def test_get_manage_user_show_create_user_form(test_config, alembic_head):
+    """ UserManagementViews.manage_users has the CreateUserForm """
+    from auth_app.views.admin import UserManagementViews
+
+    request = test_config.DummyRequest()
+    response = UserManagementViews(request).manage_users()
+
+    assert "create_user_form" in response
+    assert isinstance(response["create_user_form"], CreateUserForm)
+    assert len(response["create_user_form"].errors) == 0
 
 
 def test_create_user_redirects(test_config, alembic_head, new_user_kwargs):
@@ -61,9 +75,10 @@ def test_create_user_email_unique(test_config, alembic_head, new_user_kwargs,
     count = len(User.all())
 
     request = test_config.DummyRequest(params=new_user_kwargs)
-    UserManagementViews(request).create_user()
+    response = UserManagementViews(request).create_user()
 
     assert len(User.all()) == count
+    assert len(response['create_user_form'].errors) > 0
 
 
 @pytest.mark.parametrize("missing_kwargs", ["email"])
@@ -77,9 +92,10 @@ def test_create_user_required_arguments(test_config, alembic_head,
     new_user_kwargs.pop(missing_kwargs)
 
     request = test_config.DummyRequest(params=new_user_kwargs)
-    UserManagementViews(request).create_user()
+    response = UserManagementViews(request).create_user()
 
     assert len(User.all()) == count
+    assert len(response['create_user_form'].errors) > 0
 
 
 def test_delete_user(test_user, test_config):

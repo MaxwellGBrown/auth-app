@@ -7,6 +7,7 @@ from auth_app.models import User, Session
 pytestmark = [
     pytest.mark.functional,
     pytest.mark.views,
+    pytest.mark.admin,
     pytest.mark.usefixtures("rollback")
 ]
 
@@ -35,6 +36,25 @@ def test_get_manage_users(test_app, as_test_admin):
         assert '/admin/users/reset/{}'.format(user_id) in row
 
 
+def test_get_manage_users_shows_create_user_form(test_app, as_test_admin):
+    """ GET /admin/users 200 shows the create user form """
+    response = test_app.get('/admin/users', status=200)
+
+    create_user_form = response.html.find(id="create-user-form")
+    assert create_user_form
+    assert create_user_form.get('method') == 'POST'
+    assert create_user_form.get('action').endswith('/admin/users/create')
+
+    email_input = create_user_form.find(attrs={"name": "email"})
+    assert email_input
+
+    user_type_select = create_user_form.find(attrs={"name": "user_type"})
+    assert user_type_select
+
+    submit_input = create_user_form.find(attrs={"type": "submit"})
+    assert submit_input
+
+
 def test_get_manage_users_unauthenticated(test_app):
     """ GET /admin/users 403 while unauthenticated """
     test_app.get('/admin/users', status=403)
@@ -53,6 +73,21 @@ def test_post_create_user(test_app, as_test_admin, new_user_kwargs):
     assert new_user
     assert new_user.user_type == new_user_kwargs['user_type']
     assert new_user.token is not None
+
+
+@pytest.mark.parametrize('missing_field', ['email'])
+def test_post_create_user_requires_fields(test_app, as_test_admin,
+                                          new_user_kwargs, missing_field):
+    """ POST /admin/users shows error feedback """
+    new_user_kwargs.pop(missing_field)
+    response = test_app.post('/admin/users/create', params=new_user_kwargs)
+
+    create_user_form = response.html.find(id="create-user-form")
+
+    # unit tests can check which fields do/don't have errors
+    # fxnal tests are just going to check that there WAS an error
+    errors = create_user_form.find(class_='errors')
+    assert errors
 
 
 def test_post_create_user_unauthorized(test_app, as_test_user,
