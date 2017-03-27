@@ -17,7 +17,8 @@ def test_get_login(test_config):
 
     request = test_config.DummyRequest()
 
-    assert AuthViews(request).get_login() == {}
+    response = AuthViews(request).get_login()
+    assert 'login_form' in response
 
 
 def test_logout(test_config, ini_config):
@@ -66,7 +67,8 @@ def test_post_login_bad_password(test_config, test_user, ini_config):
     )
 
     response = AuthViews(request).post_login()
-    assert response == {}
+    assert 'login_form' in response
+    assert response['login_form'].errors
 
 
 def test_post_login_no_password(test_config, test_user, ini_config):
@@ -80,7 +82,8 @@ def test_post_login_no_password(test_config, test_user, ini_config):
     )
 
     response = AuthViews(request).post_login()
-    assert response == {}
+    assert 'login_form' in response
+    assert response['login_form'].errors
 
 
 def test_post_login_no_email(test_config, test_user, ini_config):
@@ -94,7 +97,8 @@ def test_post_login_no_email(test_config, test_user, ini_config):
     )
 
     response = AuthViews(request).post_login()
-    assert response == {}
+    assert 'login_form' in response
+    assert response['login_form'].errors
 
 
 def test_post_login_bad_email(test_config, test_user, ini_config):
@@ -109,7 +113,8 @@ def test_post_login_bad_email(test_config, test_user, ini_config):
     )
 
     response = AuthViews(request).post_login()
-    assert response == {}
+    assert 'login_form' in response
+    assert response['login_form'].errors
 
 
 def test_post_login_no_credentials(test_config, ini_config):
@@ -119,7 +124,8 @@ def test_post_login_no_credentials(test_config, ini_config):
     request = test_config.DummyRequest()
 
     response = AuthViews(request).post_login()
-    assert response == {}
+    assert 'login_form' in response
+    assert response['login_form'].errors
 
 
 def test_post_login_clears_token(test_config, test_user):

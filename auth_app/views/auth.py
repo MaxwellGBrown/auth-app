@@ -4,6 +4,7 @@ from pyramid.security import remember, forget
 from sqlalchemy.orm.exc import NoResultFound
 
 from auth_app.models import User, Session
+import auth_app.forms as forms
 
 
 @view_defaults(route_name="login", renderer="login.mako")
@@ -11,6 +12,12 @@ class AuthViews(object):
 
     def __init__(self, request):
         self.request = request
+
+    @property
+    def login_form(self):
+        if not getattr(self, '_login_form', None):
+            self._login_form = forms.LoginForm(self.request.POST)
+        return self._login_form
 
     @view_config(route_name="logout")
     def logout(self):
@@ -33,16 +40,12 @@ class AuthViews(object):
 
     @view_config(request_method="GET")
     def get_login(self):
-        return {}
+        return {"login_form": self.login_form}
 
     @view_config(request_method="POST")
     def post_login(self):
-        try:
-            user = User.one(email=self.request.POST.get('email'))
-        except NoResultFound:
-            return {}
-
-        if user.validate(self.request.POST.get('password', '')) is True:
+        if self.login_form.validate():
+            user = self.login_form.user
             if user.token is not None:  # clear any outstanding tokens
                 user.token = None
                 Session.add(user)
@@ -54,7 +57,7 @@ class AuthViews(object):
                 headers=headers
             )
         else:
-            return {}
+            return self.get_login()
 
 
 @view_defaults(route_name="redeem", context=User,

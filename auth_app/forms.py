@@ -31,3 +31,42 @@ class CreateUserForm(wtforms.Form):
             )
         except orm_exc.NoResultFound:
             pass
+
+
+class LoginForm(wtforms.Form):
+    """ A Form for authorization """
+
+    email = fields.StringField("email", validators=[val.DataRequired()])
+    password = fields.PasswordField(
+        "password",
+        validators=[val.DataRequired()]
+    )
+
+    @property
+    def user(form):
+        """ Retrieve user associated w/ data stored in form.email """
+        try:
+            return getattr(form, '_user')
+        except AttributeError:
+            pass
+
+        try:
+            form._user = User.one(email=form.email.data)
+        except orm_exc.NoResultFound:
+            form._user = None
+
+        return form._user
+
+    def validate_email(form, field):
+        """ Checks that a user w/ email exists """
+        if form.user is None:
+            raise val.StopValidation("No account associated with this email")
+
+    def validate_password(form, field):
+        """ Checks that a User.validate(`password`) returns True """
+        if form.user is None:
+            # We can't validate the password w/o a User
+            return
+
+        if not form.user.validate(field.data):
+            raise val.ValidationError("Incorrect password")
