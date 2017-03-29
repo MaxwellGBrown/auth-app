@@ -1,18 +1,12 @@
 <%inherit file="base.mako" />
+<%page args="request, login_form, **kwargs"/>
+<%namespace name="forms" file="utils/forms.mako"/>
 
 <h1>Login</h1>
 
 <form method="POST" action="${request.route_url('login')}">
-  <label for="email">
-    Email
-  </label> 
-  <input type="text" name="email"/>
-
-  <label for="password">
-    Password
-  </label> 
-  <input type="password" name="password">
-
+  ${forms.render_field(login_form.email)}
+  ${forms.render_field(login_form.password)}
   <input type="submit" value="Submit"/>
 </form>
 

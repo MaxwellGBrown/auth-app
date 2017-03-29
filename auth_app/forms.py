@@ -36,9 +36,9 @@ class CreateUserForm(wtforms.Form):
 class LoginForm(wtforms.Form):
     """ A Form for authorization """
 
-    email = fields.StringField("email", validators=[val.DataRequired()])
+    email = fields.StringField("Email", validators=[val.DataRequired()])
     password = fields.PasswordField(
-        "password",
+        "Password",
         validators=[val.DataRequired()]
     )
 
