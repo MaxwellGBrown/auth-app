@@ -28,6 +28,13 @@ To begin, make sure that `docker is installed <https://www.docker.com/get-docker
      $ docker build -t auth-app .
 
 
+#. Build ``auth_app.egg-info`` for pyramid to read when mounting volumes
+
+   ::
+
+     $ docker run -v $(pwd):/auth-app auth-app pip install -e .
+
+
 #. Create & migrate the database specified in ``development.ini`` under ``[app:main]``'s ``sqlalchemy.url``
 
    ::
