@@ -2,7 +2,7 @@ import pyramid.httpexceptions as http
 from pyramid.view import view_config, view_defaults
 
 import auth_app.forms as forms
-from auth_app.models import User, Session
+from auth_app.auth import User
 
 
 @view_defaults(permission="admin", renderer="manage_users.mako")
@@ -20,7 +20,7 @@ class UserManagementViews(object):
     @view_config(route_name="manage_users")
     def manage_users(self):
         return {
-            "users": User.all(),
+            "users": [],  # TODO Return a list of users
             "create_user_form": self.create_user_form,
         }
 
@@ -29,25 +29,15 @@ class UserManagementViews(object):
         if not self.create_user_form.validate():
             return self.manage_users()
 
-        new_user = User(**self.create_user_form.data)
-        new_user.reset()  # randomize password and create token
-        Session.add(new_user)
-        try:
-            Session.commit()
-        except:
-            Session.rollback()
-            raise http.HTTPInternalServerError()
+        # TODO create a new user
         return http.HTTPFound(self.request.route_url("manage_users"))
 
     @view_config(route_name="delete_user", context=User)
     def delete_user(self):
-        Session.delete(self.request.context)
-        Session.commit()
+        # TODO delete a user
         return http.HTTPFound(self.request.route_url("manage_users"))
 
     @view_config(route_name="reset_user", context=User)
     def reset_user(self):
-        self.request.context.reset()
-        Session.add(self.request.context)
-        Session.commit()
+        # TODO "reset" a user (password, account, whatever)
         return http.HTTPFound(self.request.route_url("manage_users"))

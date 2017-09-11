@@ -6,9 +6,6 @@ import auth_app.forms as forms
 pytestmark = [
     pytest.mark.unit,
     pytest.mark.forms,
-    # these forms have a validator that relies on the `user` table; needs bind
-    pytest.mark.usefixtures('alembic_head'),
-    pytest.mark.usefixtures('rollback')
 ]
 
 
@@ -30,15 +27,6 @@ def test_create_user_form_valid_email(new_user_kwargs, email_value, is_valid):
     create_user_form.validate()
     invalid_email = message in create_user_form.email.errors
     assert invalid_email != is_valid
-
-
-def test_create_user_form_error_with_taken_email(new_user_kwargs, test_user):
-    """ CreateUserForm.email requires an unused email address """
-    message = 'Email "{}" is already in use!'.format(test_user.email)
-    new_user_kwargs['email'] = test_user.email
-    create_user_form = forms.CreateUserForm(data=new_user_kwargs)
-    create_user_form.validate()
-    assert message in create_user_form.email.errors
 
 
 @pytest.mark.parametrize('user_type_value,is_valid', [

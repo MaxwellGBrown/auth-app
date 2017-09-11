@@ -1,9 +1,6 @@
 from pyramid.config import Configurator
-from sqlalchemy import engine_from_config
 
 import auth_app.auth
-import auth_app.models as app_model
-from auth_app.request import request_user
 
 
 def configure(config, **settings):
@@ -24,7 +21,7 @@ def configure(config, **settings):
     config.set_authentication_policy(authn_policy)
 
     # request methods
-    config.add_request_method(request_user, "user", reify=True)
+    config.add_request_method(auth_app.auth.request_user, "user", reify=True)
 
     # standard routes
     config.add_route('index', '/')
@@ -35,26 +32,19 @@ def configure(config, **settings):
     config.add_route('logout', '/logout')
     config.add_route('forgot_password', '/forgot_password')
     config.add_route('redeem', '/redeem/{token}',
-                     factory=app_model.User.route_factory)
+                     factory=auth_app.auth.user_factory)
 
     # /admin/users
     config.add_route('manage_users', '/admin/users')
     config.add_route('create_user', '/admin/users/create')
     config.add_route('reset_user', '/admin/users/reset/{user_id}',
-                     factory=app_model.User.route_factory)
+                     factory=auth_app.auth.user_factory)
     config.add_route('delete_user', '/admin/users/delete/{user_id}',
-                     factory=app_model.User.route_factory)
+                     factory=auth_app.auth.user_factory)
 
 
 def main(global_config, **settings):
     config = Configurator(settings=settings)
-
-    # connect ORM model to database
-    engine = engine_from_config(configuration=settings, prefix="sqlalchemy.")
-    app_model.bind_engine(engine)
-
     configure(config, **settings)
-
     config.scan()
-
     return config.make_wsgi_app()

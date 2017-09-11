@@ -9,7 +9,7 @@ Auth App also comes with a Dockerfile so it can be deployed using `docker <https
 Auth App comes complete with...
 
 * A basic User SQLAlchemy model with password hashing & token recovery
-* Pyramid authentication & authorization using the SQLAlchemy User model
+* Pyramid authentication & authorization using Amazon ``cognito-idp``
 * Unit & Functional tests on an authentication & authorization app using pytest
 * A Dockerfile for application development and deployment
 
@@ -33,13 +33,6 @@ To begin, make sure that `docker is installed <https://www.docker.com/get-docker
    ::
 
      $ docker run -v $(pwd):/auth-app auth-app pip install -e .
-
-
-#. Create & migrate the database specified in ``development.ini`` under ``[app:main]``'s ``sqlalchemy.url``
-
-   ::
-
-     $ docker run auth-app alembic -c development.ini upgrade head
 
 
 #. Mount the app directory as a volume and serve the app!

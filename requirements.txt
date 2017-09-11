@@ -1,9 +1,7 @@
-alembic==0.8.10
 gunicorn==19.7.0
 Mako==1.0.6
 pyramid==1.8.1
 pyramid-mako==1.0.2
 pytest==3.0.6
-SQLAlchemy==1.0.14
 WebTest==2.0.25
 WTForms==2.1

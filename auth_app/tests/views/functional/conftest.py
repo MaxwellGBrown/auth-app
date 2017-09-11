@@ -7,7 +7,7 @@ from auth_app.auth import auth_callback
 
 
 @pytest.fixture(scope="class")
-def test_app(request, ini_config, ini_filepath, alembic_head):
+def test_app(request, ini_config, ini_filepath):
     """ returns pyramid app object initialized as a webtest.TestApp object """
     from webtest import TestApp
 
