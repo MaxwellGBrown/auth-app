@@ -1,6 +1,8 @@
 from pyramid.config import Configurator
 
 import auth_app.auth
+from auth_app.user import configure_cognito_idp
+from auth_app.util import sub_settings
 
 
 def configure(config, **settings):
@@ -14,11 +16,17 @@ def configure(config, **settings):
     config.set_root_factory(auth_app.auth.root_factory)
 
     # authentication
-    auth_cfg = {k[5:]: v for k, v in settings.items() if k[:5] == "auth."}
+    auth_cfg = sub_settings(settings, 'auth')
     authn_policy = auth_app.auth.authentication_policy(
         callback=auth_app.auth.auth_callback, **auth_cfg
     )
     config.set_authentication_policy(authn_policy)
+
+    # aws cognito-idp to manage users & authentication
+    aws_cfg = sub_settings(settings, 'aws')
+    cognito_idp_cfg = sub_settings(settings, 'cognito_idp')
+    configure_cognito_idp(region_name=aws_cfg['region_name'],
+                          **cognito_idp_cfg)
 
     # request methods
     config.add_request_method(auth_app.auth.request_user, "user", reify=True)

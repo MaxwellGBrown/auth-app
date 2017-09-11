@@ -1,3 +1,4 @@
+import boto3
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 import pyramid.httpexceptions as http
@@ -40,6 +41,42 @@ def auth_callback(userid, request):
 
     # TODO: Return a user's ACLs'
     return ("admin",)
+
+
+class RequestCognitoIdp(object):
+    """
+    A configured object that returns an Cognito sesion on call
+
+    >>> config.add_request_method(RequestCognitoIdp(**config), "idp")
+    """
+
+    def __init__(self, region_name):
+        self.region_name = region_name
+
+    def __call__(self, request):
+        session = boto3.session.Session(region_name=self.region_name)
+        return session.client('cognito-identiy')
+
+
+class UserManager(object):
+    """
+    An interface for working w/ user classes.
+
+    Why?
+    Because the views don't care what the objects look like, they just want
+    objects they can work with.
+
+    So, if you're (I don't know...) switching from an ORM Auth model to an
+    authentication service then you'd have to change how each view interfaces
+    with the User model object (e.g. querying the database vs requesting from
+    the Identity Provider) instead of just dropping in a new class that just
+    interfaces with the provider instead of the database (but still returns
+    similar objects).
+    """
+
+    def list_users(self, offset=0):
+        """ Return a list of users """
+        return []  # TODO
 
 
 def request_user(request):

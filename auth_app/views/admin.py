@@ -3,6 +3,8 @@ from pyramid.view import view_config, view_defaults
 
 import auth_app.forms as forms
 from auth_app.auth import User
+# TODO Move any UserManager calls to request.context factories
+from auth_app.user import UserManager
 
 
 @view_defaults(permission="admin", renderer="manage_users.mako")
@@ -20,7 +22,7 @@ class UserManagementViews(object):
     @view_config(route_name="manage_users")
     def manage_users(self):
         return {
-            "users": [],  # TODO Return a list of users
+            "users": UserManager.list_users(),  # TODO move to request.context
             "create_user_form": self.create_user_form,
         }
 
