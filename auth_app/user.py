@@ -40,6 +40,22 @@ class UserManager(object):
 
         return user_list
 
+    @classmethod
+    def create_user(cls, username):
+        """
+        Create a new user in a user_pool.
+
+        Since we're useing cognito-idp's `admin_create_user` we can only set a
+        temporary password.
+        """
+        response = cognito_idp.admin_create_user(
+            UserPoolId=cls.UserPoolId,
+            Username=username
+        )
+
+        new_user = User(**response['User'])
+        return new_user
+
 
 class User(object):
     """ A python class that represents one aws cognito-idp User """
